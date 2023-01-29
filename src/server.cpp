@@ -1,6 +1,8 @@
 #include <filesystem>
 #include <iostream>
 
+#include <fmt/core.h>
+
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/systemd_sink.h>
 #include <spdlog/spdlog.h>
@@ -108,38 +110,18 @@ Server::worker()
             {
                 const auto& e = elements.front();
 
-                std::string prefix = "[" + e.channel + "] ";
+                const auto message =
+                    fmt::format("[{0}] [{1}:{2}] [{3}:{4}:{5}] {6}",
+                                e.channel,
+                                e.process_id,
+                                e.thread_id,
+                                e.filename,
+                                e.line,
+                                e.func,
+                                e.message);
 
-                prefix += "[" + std::to_string(e.process_id) + ":" +
-                    std::to_string(e.thread_id) + "] ";
-
-                std::string location;
-                if (e.filename)
-                {
-                    location += *e.filename;
-                    if (e.line)
-                    {
-                        location += ":" + std::to_string(*e.line);
-                    }
-                    if (e.func)
-                    {
-                        location += ":";
-                    }
-                }
-                if (e.func)
-                {
-                    location += *e.func;
-                }
-
-                if (!location.empty())
-                {
-                    prefix += "[" + location + "] ";
-                }
-
-                m_logger->log(e.time,
-                              spdlog::source_loc{},
-                              e.log_level,
-                              prefix + e.message);
+                m_logger->log(
+                    e.time, spdlog::source_loc{}, e.log_level, message);
 
                 elements.pop();
             }

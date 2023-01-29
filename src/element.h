@@ -14,11 +14,11 @@ struct Element
     spdlog::log_clock::time_point time; // u
     spdlog::level::level_enum log_level = spdlog::level::debug; // l
     std::string message; // m
-    int process_id = 0; // p
-    int thread_id = 0; // t
-    std::optional<std::string> filename; // f
-    std::optional<int> line; // i
-    std::optional<std::string> func; // n
+    std::string process_id; // p
+    std::string thread_id; // t
+    std::string filename; // f
+    std::string line; // i
+    std::string func; // n
 
     static Element
     from_xml(const std::string& xml);

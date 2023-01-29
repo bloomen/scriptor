@@ -39,7 +39,7 @@ Element::from_xml(const std::string& xml)
     if (auto log_level = tree.get_child_optional("l"))
     {
         const auto level = log_level->get_value<int>();
-        if (level >= spdlog::level::trace && level < spdlog::level::off)
+        if (level >= spdlog::level::trace && level < spdlog::level::n_levels)
         {
             e.log_level = static_cast<spdlog::level::level_enum>(level);
         }
@@ -51,13 +51,13 @@ Element::from_xml(const std::string& xml)
     // process id
     if (auto process_id = tree.get_child_optional("p"))
     {
-        e.process_id = process_id->get_value<int>();
+        e.process_id = process_id->get_value<std::string>();
     }
 
     // thread id
     if (auto thread_id = tree.get_child_optional("t"))
     {
-        e.thread_id = thread_id->get_value<int>();
+        e.thread_id = thread_id->get_value<std::string>();
     }
 
     // filename
@@ -69,7 +69,7 @@ Element::from_xml(const std::string& xml)
     // line
     if (auto line = tree.get_child_optional("i"))
     {
-        e.line = line->get_value<int>();
+        e.line = line->get_value<std::string>();
     }
 
     // func
