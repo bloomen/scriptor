@@ -1,4 +1,4 @@
-// scriptor - A high-performance logger on Linux recieving from unix sockets
+// scriptor - A high-performance logger receiving from unix file sockets
 // Repo: https://github.com/bloomen/scriptor
 // Author: Christian Blume
 // License: MIT http://www.opensource.org/licenses/mit-license.php
