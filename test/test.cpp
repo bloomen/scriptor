@@ -49,6 +49,30 @@ TEST(scriptor, xml_unescape_with_all_escapers)
     ASSERT_EQ(exp, xml);
 }
 
+TEST(scriptor, xml_unescape_with_only_escapers)
+{
+    std::string xml = "&quot;&lt;&lt;&gt;&apos;&amp;&gt;&apos;&amp;";
+    const std::string exp = "\"<<>'&>'&";
+    scriptor::xml_unescape(xml);
+    ASSERT_EQ(exp, xml);
+}
+
+TEST(scriptor, xml_unescape_with_escapers_and_random_ampersands)
+{
+    std::string xml = "&&quot;alb&lt;er&t&apos;eins&gt;&tein&amp;&";
+    const std::string exp = "&\"alb<er&t'eins>&tein&&";
+    scriptor::xml_unescape(xml);
+    ASSERT_EQ(exp, xml);
+}
+
+TEST(scriptor, xml_unescape_with_half_escapers)
+{
+    std::string xml = "quot;alb&lt;ert&aos;eins&gt;tein&amp";
+    const std::string exp = "quot;alb<ert&aos;eins>tein&amp";
+    scriptor::xml_unescape(xml);
+    ASSERT_EQ(exp, xml);
+}
+
 int
 main(int argc, char** argv)
 {
