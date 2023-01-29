@@ -1,10 +1,12 @@
 #pragma once
 
 #include <array>
+#include <functional>
 #include <memory>
 #include <string>
 
 #include "aio.h"
+#include "element.h"
 
 namespace scriptor
 {
@@ -12,7 +14,8 @@ namespace scriptor
 class Session : public std::enable_shared_from_this<Session>
 {
 public:
-    explicit Session(aio::local::stream_protocol::socket&& socket);
+    Session(aio::local::stream_protocol::socket&& socket,
+            std::function<void(Element&&)> push);
 
     Session(const Session&) = delete;
     Session&
@@ -27,6 +30,8 @@ public:
 private:
     aio::local::stream_protocol::socket m_socket;
     std::array<char, 1024> m_buffer;
+    std::function<void(Element&&)> m_push;
+    std::string m_current;
 };
 
 } // namespace scriptor

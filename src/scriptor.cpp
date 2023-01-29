@@ -1,20 +1,23 @@
-// scriptor - A high-performance logger receiving from unix file sockets
+// scriptor - A high-performance logger for Linux using unix file sockets
 // Repo: https://github.com/bloomen/scriptor
 // Author: Christian Blume
 // License: MIT http://www.opensource.org/licenses/mit-license.php
 
 #include "server.h"
 
+#include <atomic>
 #include <csignal>
 #include <filesystem>
 #include <iostream>
 
 using namespace scriptor;
 
+std::atomic<int> g_signal{0};
+
 void
-signal_handler(int)
+signal_handler(int signal)
 {
-    std::exit(0);
+    g_signal = signal;
 }
 
 int
@@ -26,6 +29,7 @@ main(int argc, char** argv)
     {
         if (argc < 2)
         {
+            // TODO use boost prog args
             throw std::runtime_error{
                 "Socket file not given. Usage: scriptor <socket_file>"};
         }
@@ -35,6 +39,10 @@ main(int argc, char** argv)
             std::filesystem::remove(path);
         }
         Server server{std::thread::hardware_concurrency(), path.u8string()};
+        while (g_signal == 0)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds{10});
+        }
     }
     catch (const std::exception& e)
     {

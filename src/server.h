@@ -1,6 +1,11 @@
 #pragma once
 
+#include <condition_variable>
+#include <queue>
+#include <thread>
 #include <vector>
+
+#include <spdlog/logger.h>
 
 #include "session.h"
 
@@ -25,11 +30,20 @@ private:
     accept();
 
     void
+    worker();
+
+    void
     shutdown();
 
     aio::io_context m_ioc;
-    std::vector<std::thread> m_threads;
+    std::vector<std::thread> m_ioc_threads;
     aio::local::stream_protocol::acceptor m_acceptor;
+    bool m_done{false};
+    std::thread m_log_thread;
+    std::condition_variable m_cv;
+    std::mutex m_mutex;
+    std::queue<Element> m_queue;
+    std::shared_ptr<spdlog::logger> m_logger;
 };
 
 } // namespace scriptor
