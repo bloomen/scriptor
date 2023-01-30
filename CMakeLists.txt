@@ -69,7 +69,7 @@ set(scriptor_core_source_files
 
 add_library(scriptor_core ${scriptor_core_source_files})
 scriptor_add_flags(scriptor_core)
-target_link_libraries(scriptor_core systemd spdlog$<$<CONFIG:Debug>:d> fmt$<$<CONFIG:Debug>:d>)
+target_link_libraries(scriptor_core boost_program_options systemd spdlog$<$<CONFIG:Debug>:d> fmt$<$<CONFIG:Debug>:d>)
 
 add_executable(scriptor src/scriptor.cpp)
 scriptor_add_flags(scriptor)

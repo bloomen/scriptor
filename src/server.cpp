@@ -29,7 +29,8 @@ Server::Server(const Options& opt)
             opt.file_sink_filename,
             opt.file_sink_max_file_size,
             opt.file_sink_max_files);
-        file_sink->set_level(opt.file_sink_log_level);
+        file_sink->set_level(
+            static_cast<spdlog::level::level_enum>(opt.file_sink_log_level));
         file_sink->set_pattern(pattern);
         sinks.push_back(std::move(file_sink));
     }
@@ -38,7 +39,8 @@ Server::Server(const Options& opt)
     {
         auto systemd_sink = std::make_shared<spdlog::sinks::systemd_sink_mt>(
             opt.identity, false);
-        systemd_sink->set_level(opt.systemd_sink_log_level);
+        systemd_sink->set_level(
+            static_cast<spdlog::level::level_enum>(opt.systemd_sink_log_level));
         sinks.push_back(std::move(systemd_sink));
     }
 
@@ -46,7 +48,8 @@ Server::Server(const Options& opt)
     {
         auto syslog_sink = std::make_shared<spdlog::sinks::syslog_sink_mt>(
             opt.identity, LOG_PID, LOG_USER, false);
-        syslog_sink->set_level(opt.syslog_sink_log_level);
+        syslog_sink->set_level(
+            static_cast<spdlog::level::level_enum>(opt.syslog_sink_log_level));
         sinks.push_back(std::move(syslog_sink));
     }
 
