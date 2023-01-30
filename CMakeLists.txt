@@ -65,8 +65,6 @@ set(scriptor_core_source_files
     ${PROJECT_SOURCE_DIR}/src/server.cpp
     ${PROJECT_SOURCE_DIR}/src/session.h
     ${PROJECT_SOURCE_DIR}/src/session.cpp
-    ${PROJECT_SOURCE_DIR}/src/utils.h
-    ${PROJECT_SOURCE_DIR}/src/utils.cpp
 )
 
 add_library(scriptor_core ${scriptor_core_source_files})

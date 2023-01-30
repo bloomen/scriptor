@@ -9,71 +9,6 @@
 
 #include "element.h"
 #include "session.h"
-#include "utils.h"
-
-TEST(utils, xml_unescape_with_nothing_to_escape)
-{
-    std::string xml = "<a>albert einstein</a>";
-    const auto exp = xml;
-    scriptor::xml_unescape(xml);
-    ASSERT_EQ(exp, xml);
-}
-
-TEST(utils, xml_unescape_with_amp)
-{
-    std::string xml = "<a>albert&amp;einstein</a>";
-    scriptor::xml_unescape(xml);
-    const std::string exp = "<a>albert&einstein</a>";
-    ASSERT_EQ(exp, xml);
-}
-
-TEST(utils, xml_unescape_with_amp_at_beginning)
-{
-    std::string xml = "&amp;albert einstein</a>";
-    const std::string exp = "&albert einstein</a>";
-    scriptor::xml_unescape(xml);
-    ASSERT_EQ(exp, xml);
-}
-
-TEST(utils, xml_unescape_with_amp_at_end)
-{
-    std::string xml = "albert einstein&amp;";
-    const std::string exp = "albert einstein&";
-    scriptor::xml_unescape(xml);
-    ASSERT_EQ(exp, xml);
-}
-
-TEST(utils, xml_unescape_with_all_escapers)
-{
-    std::string xml = "&quot;alb&lt;ert&apos;eins&gt;tein&amp;";
-    const std::string exp = "\"alb<ert'eins>tein&";
-    scriptor::xml_unescape(xml);
-    ASSERT_EQ(exp, xml);
-}
-
-TEST(utils, xml_unescape_with_only_escapers)
-{
-    std::string xml = "&quot;&lt;&lt;&gt;&apos;&amp;&gt;&apos;&amp;";
-    const std::string exp = "\"<<>'&>'&";
-    scriptor::xml_unescape(xml);
-    ASSERT_EQ(exp, xml);
-}
-
-TEST(utils, xml_unescape_with_escapers_and_random_ampersands)
-{
-    std::string xml = "&&quot;alb&lt;er&t&apos;eins&gt;&tein&amp;&";
-    const std::string exp = "&\"alb<er&t'eins>&tein&&";
-    scriptor::xml_unescape(xml);
-    ASSERT_EQ(exp, xml);
-}
-
-TEST(utils, xml_unescape_with_half_escapers)
-{
-    std::string xml = "quot;alb&lt;ert&aos;eins&gt;tein&amp";
-    const std::string exp = "quot;alb<ert&aos;eins>tein&amp";
-    scriptor::xml_unescape(xml);
-    ASSERT_EQ(exp, xml);
-}
 
 TEST(element, from_xml_with_all_tags)
 {
@@ -98,6 +33,16 @@ TEST(element, from_xml_with_only_required)
     scriptor::Element e;
     e.channel = "doner";
     e.message = "blah";
+    const auto res = scriptor::Element::from_xml(xml);
+    ASSERT_EQ(e, res);
+}
+
+TEST(element, from_xml_with_escaped_xml)
+{
+    const std::string xml = "<c>do&amp;ner</c><m>bl&lt;ah</m>";
+    scriptor::Element e;
+    e.channel = "do&ner";
+    e.message = "bl<ah";
     const auto res = scriptor::Element::from_xml(xml);
     ASSERT_EQ(e, res);
 }
