@@ -4,6 +4,7 @@
 #include <fmt/core.h>
 
 #include <spdlog/sinks/rotating_file_sink.h>
+#include <spdlog/sinks/stdout_sinks.h>
 #include <spdlog/sinks/syslog_sink.h>
 #include <spdlog/sinks/systemd_sink.h>
 #include <spdlog/spdlog.h>
@@ -13,30 +14,52 @@
 namespace scriptor
 {
 
-Server::Server(const std::size_t n_threads, const std::string& file)
-    : m_acceptor{m_ioc, aio::local::stream_protocol::endpoint{file}}
+Server::Server(const Options& opt)
+    : m_acceptor{m_ioc, aio::local::stream_protocol::endpoint{opt.socket_file}}
 {
     // 1. Instantiate logging objects
-    const std::string ident = "FOOBAR";
-
     spdlog::flush_on(spdlog::level::warn);
+    const std::string pattern = "[%Y-%m-%dT%H:%M:%S.%f] [%l] %v";
 
-    auto rotating_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
-        "/tmp/mylog.txt", 1024 * 1024 * 10, 3);
-    rotating_sink->set_level(spdlog::level::trace);
-    rotating_sink->set_pattern("[%Y-%m-%dT%H:%M:%S.%f] [%l] %v");
+    std::vector<spdlog::sink_ptr> sinks;
 
-    auto systemd_sink =
-        std::make_shared<spdlog::sinks::systemd_sink_mt>(ident, false);
-    systemd_sink->set_level(spdlog::level::trace);
+    if (!opt.file_sink_filename.empty())
+    {
+        auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
+            opt.file_sink_filename,
+            opt.file_sink_max_file_size,
+            opt.file_sink_max_files);
+        file_sink->set_level(opt.file_sink_log_level);
+        file_sink->set_pattern(pattern);
+        sinks.push_back(std::move(file_sink));
+    }
 
-    auto syslog_sink = std::make_shared<spdlog::sinks::syslog_sink_mt>(
-        ident, LOG_PID, LOG_USER, false);
-    syslog_sink->set_level(spdlog::level::trace);
+    if (opt.systemd_sink_use)
+    {
+        auto systemd_sink = std::make_shared<spdlog::sinks::systemd_sink_mt>(
+            opt.identity, false);
+        systemd_sink->set_level(opt.systemd_sink_log_level);
+        sinks.push_back(std::move(systemd_sink));
+    }
 
-    std::initializer_list<spdlog::sink_ptr> sinks{
-        rotating_sink, systemd_sink, syslog_sink};
-    m_logger = std::make_shared<spdlog::logger>("scriptor", sinks);
+    if (opt.syslog_sink_use)
+    {
+        auto syslog_sink = std::make_shared<spdlog::sinks::syslog_sink_mt>(
+            opt.identity, LOG_PID, LOG_USER, false);
+        syslog_sink->set_level(opt.syslog_sink_log_level);
+        sinks.push_back(std::move(syslog_sink));
+    }
+
+    if (sinks.empty())
+    {
+        auto console_sink = std::make_shared<spdlog::sinks::stdout_sink_mt>();
+        console_sink->set_level(spdlog::level::trace);
+        console_sink->set_pattern(pattern);
+        sinks.push_back(std::move(console_sink));
+    }
+
+    m_logger = std::make_shared<spdlog::logger>(
+        "scriptor", sinks.begin(), sinks.end());
     m_logger->set_level(spdlog::level::trace);
 
     // 2. Setup consumer thread
@@ -44,7 +67,7 @@ Server::Server(const std::size_t n_threads, const std::string& file)
 
     // 3. Setup producers
     accept();
-    while (m_ioc_threads.size() < n_threads)
+    while (m_ioc_threads.size() < opt.n_threads)
     {
         std::thread thread;
         try

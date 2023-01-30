@@ -33,12 +33,16 @@ main(int argc, char** argv)
             throw std::runtime_error{
                 "Socket file not given. Usage: scriptor <socket_file>"};
         }
+
         const std::filesystem::path path{argv[1]};
         if (std::filesystem::exists(path))
         {
             std::filesystem::remove(path);
         }
-        Server server{std::thread::hardware_concurrency(), path.u8string()};
+
+        Options opt;
+        opt.socket_file = path.u8string();
+        Server server{opt};
         while (g_signal == 0)
         {
             std::this_thread::sleep_for(std::chrono::milliseconds{10});
