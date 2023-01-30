@@ -38,7 +38,7 @@ $ ./scriptor --socket_file /tmp/scriptor.sock --identity myorg\
   --filelog_filename /tmp/filelog.txt --systemd_logging --systemd_level 2
 ```
 This starts a server listening for connections on the given file socket.
-Any number of clients can then connect and send logs in the following format:
+Any number of clients can then connect and send logs in the following XML format:
 ```
 <c>channel_name</c><t>thread_id</t><p>process_id</p><u>time_us_since_epoch</u>\
   <f>filename</f><i>line_no</i><n>function_name</n><m>log_message</m>
