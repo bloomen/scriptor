@@ -12,6 +12,10 @@
 namespace scriptor
 {
 
+struct Options
+{
+};
+
 class Server
 {
 public:

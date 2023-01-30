@@ -71,7 +71,7 @@ Server::Server(const std::size_t n_threads, const std::string& file)
 
 Server::~Server()
 {
-    // 1. Shutdown producers
+    // 3. Shutdown producers
     shutdown();
 
     // 2. Shutdown consumer
@@ -82,7 +82,7 @@ Server::~Server()
     m_cv.notify_one();
     m_log_thread.join();
 
-    // 3. Flush logger
+    // 1. Flush logger
     m_logger->flush();
 }
 
@@ -94,11 +94,16 @@ Server::accept()
                                 aio::local::stream_protocol::socket&& socket) {
         if (!ec)
         {
-            std::make_shared<Session>(std::move(socket), [this](Element&& e) {
-                std::lock_guard lock{m_mutex};
-                m_queue.emplace(std::move(e));
-                m_cv.notify_one();
-            })->read();
+            std::make_shared<Session>(std::move(socket),
+                                      [this](std::vector<Element>&& elements) {
+                                          std::lock_guard lock{m_mutex};
+                                          for (auto&& e : elements)
+                                          {
+                                              m_queue.emplace(std::move(e));
+                                          }
+                                          m_cv.notify_one();
+                                      })
+                ->read();
         }
         accept();
     });

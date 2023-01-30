@@ -35,7 +35,7 @@ class Session : public std::enable_shared_from_this<Session>
 {
 public:
     Session(aio::local::stream_protocol::socket&& socket,
-            std::function<void(Element&&)> push);
+            std::function<void(std::vector<Element>&&)> push);
 
     Session(const Session&) = delete;
     Session&
@@ -50,7 +50,7 @@ public:
 private:
     aio::local::stream_protocol::socket m_socket;
     std::array<char, 1024> m_buffer;
-    std::function<void(Element&&)> m_push;
+    std::function<void(std::vector<Element>&&)> m_push;
     Processor m_processor;
 };
 

@@ -47,7 +47,7 @@ Processor::operator()(const char* const data, const std::size_t length)
 }
 
 Session::Session(aio::local::stream_protocol::socket&& socket,
-                 std::function<void(Element&&)> push)
+                 std::function<void(std::vector<Element>&&)> push)
     : m_socket{std::move(socket)}
     , m_push{std::move(push)}
 {
@@ -62,11 +62,9 @@ Session::read()
         [self](const boost::system::error_code ec, const std::size_t length) {
             if (!ec)
             {
-                for (auto&& element :
-                     self->m_processor(self->m_buffer.data(), length))
-                {
-                    self->m_push(std::move(element));
-                }
+                auto&& elements =
+                    self->m_processor(self->m_buffer.data(), length);
+                self->m_push(std::move(elements));
                 self->read();
             }
         });
