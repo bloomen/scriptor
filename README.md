@@ -34,5 +34,6 @@ scriptor - A high-performance logger for Linux using unix file sockets:
 ```
 For instance:
 ```
-$ ./scriptor --socket_file /tmp/scriptor.sock --identity myorg --filelog_filename /tmp/filelog.txt --systemd_logging --systemd_level 2
+$ ./scriptor --socket_file /tmp/scriptor.sock --identity myorg \
+  --filelog_filename /tmp/filelog.txt --systemd_logging --systemd_level 2
 ```
