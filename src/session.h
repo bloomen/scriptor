@@ -11,6 +11,25 @@
 namespace scriptor
 {
 
+class Processor
+{
+public:
+    Processor() = default;
+
+    Processor(const Processor&) = delete;
+    Processor&
+    operator=(const Processor&) = delete;
+    Processor(Processor&&) = delete;
+    Processor&
+    operator=(Processor&&) = delete;
+
+    std::optional<Element>
+    operator()(const char* data, std::size_t length);
+
+private:
+    std::string m_current;
+};
+
 class Session : public std::enable_shared_from_this<Session>
 {
 public:
@@ -31,7 +50,7 @@ private:
     aio::local::stream_protocol::socket m_socket;
     std::array<char, 1024> m_buffer;
     std::function<void(Element&&)> m_push;
-    std::string m_current;
+    Processor m_processor;
 };
 
 } // namespace scriptor
