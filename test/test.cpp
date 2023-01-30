@@ -99,7 +99,7 @@ TEST(processor, one_shot_and_again)
     ASSERT_EQ(e2, res2[0]);
 }
 
-TEST(processor, one_shot_with_two_elements) // fails
+TEST(processor, one_shot_with_two_elements)
 {
     const std::string data = "asfa<c>doner</c><m>guanchen</m>wfqfgvwev<c>bar</c><m>dani</m>wfqwf";
     scriptor::Element e1;
