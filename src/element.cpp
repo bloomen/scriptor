@@ -6,12 +6,6 @@ namespace scriptor
 {
 
 bool
-Element::operator<(const Element& o) const
-{
-    return make_tie() < o.make_tie();
-}
-
-bool
 Element::operator==(const Element& o) const
 {
     return make_tie() == o.make_tie();

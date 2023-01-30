@@ -21,9 +21,6 @@ struct Element
     std::string func; // n
 
     bool
-    operator<(const Element& o) const;
-
-    bool
     operator==(const Element& o) const;
 
     auto
