@@ -120,8 +120,9 @@ Server::worker()
                                 e.func,
                                 e.message);
 
-                m_logger->log(
-                    e.time, spdlog::source_loc{}, e.log_level, message);
+                const auto time = e.time ? *e.time : spdlog::log_clock::now();
+
+                m_logger->log(time, spdlog::source_loc{}, e.log_level, message);
 
                 elements.pop();
             }

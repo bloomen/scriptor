@@ -1,23 +1,29 @@
-#include <chrono>
-
-#include <boost/property_tree/detail/file_parser_error.hpp>
-#include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
 #include "element.h"
 
-namespace pt = boost::property_tree;
-
 namespace scriptor
 {
+
+bool
+Element::operator<(const Element& o) const
+{
+    return make_tie() < o.make_tie();
+}
+
+bool
+Element::operator==(const Element& o) const
+{
+    return make_tie() == o.make_tie();
+}
 
 Element
 Element::from_xml(const std::string& xml)
 {
-    pt::ptree tree;
+    boost::property_tree::ptree tree;
     std::stringstream ss;
     ss << xml;
-    pt::read_xml(ss, tree);
+    boost::property_tree::read_xml(ss, tree);
 
     Element e;
 
@@ -29,10 +35,6 @@ Element::from_xml(const std::string& xml)
     {
         const std::chrono::microseconds us{time_us->get_value<std::uint64_t>()};
         e.time = spdlog::log_clock::time_point{us};
-    }
-    else
-    {
-        e.time = spdlog::log_clock::now();
     }
 
     // log level
