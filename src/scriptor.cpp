@@ -40,7 +40,7 @@ main(int argc, char** argv)
             "The unix socket filename (required)")(
             "identity",
             po::value<std::string>(&opt.identity)->default_value(opt.identity),
-            "The identify name")
+            "The identity name")
 
             // file logging
             ("filelog_filename",
