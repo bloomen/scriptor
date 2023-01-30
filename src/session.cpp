@@ -11,29 +11,39 @@ const std::string end = "</m>";
 
 } // namespace
 
-std::optional<Element>
+std::vector<Element>
 Processor::operator()(const char* const data, const std::size_t length)
 {
     m_current.append(data, length);
-    const auto is = m_current.find(start);
-    if (is != std::string::npos)
-    {
-        const auto ie = m_current.find(end, is);
-        if (ie != std::string::npos)
+
+    auto find_one = [this]() -> std::optional<Element> {
+        const auto is = m_current.find(start);
+        if (is != std::string::npos)
         {
-            const auto xml = m_current.substr(is, ie - is + end.size());
-            try
+            const auto ie = m_current.find(end, is);
+            if (ie != std::string::npos)
             {
-                return Element::from_xml(xml);
+                const auto xml = m_current.substr(is, ie - is + end.size());
+                m_current = m_current.substr(ie + end.size());
+                try
+                {
+                    return Element::from_xml(xml);
+                }
+                catch (...)
+                {
+                    // invalid xml - ignore.
+                }
             }
-            catch (...)
-            {
-                // invalid xml - ignore.
-            }
-            m_current = m_current.substr(ie + end.size());
         }
+        return std::nullopt;
+    };
+
+    std::vector<Element> elements;
+    while (auto e = find_one())
+    {
+        elements.push_back(*e);
     }
-    return std::nullopt;
+    return elements;
 }
 
 Session::Session(aio::local::stream_protocol::socket&& socket,
@@ -52,10 +62,10 @@ Session::read()
         [self](const boost::system::error_code ec, const std::size_t length) {
             if (!ec)
             {
-                if (auto element =
-                        self->m_processor(self->m_buffer.data(), length))
+                for (auto&& element :
+                     self->m_processor(self->m_buffer.data(), length))
                 {
-                    self->m_push(std::move(*element));
+                    self->m_push(std::move(element));
                 }
                 self->read();
             }

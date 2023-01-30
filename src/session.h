@@ -4,6 +4,7 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "aio.h"
 #include "element.h"
@@ -23,7 +24,7 @@ public:
     Processor&
     operator=(Processor&&) = delete;
 
-    std::optional<Element>
+    std::vector<Element>
     operator()(const char* data, std::size_t length);
 
 private:

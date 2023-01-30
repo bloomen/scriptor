@@ -128,7 +128,46 @@ TEST(processor, one_shot)
     e.message = "blah";
     scriptor::Processor proc;
     const auto res = proc(data.data(), data.size());
-    ASSERT_EQ(e, *res);
+    ASSERT_EQ(1u, res.size());
+    ASSERT_EQ(e, res[0]);
+}
+
+TEST(processor, one_shot_and_again)
+{
+    const std::string data1 = "<c>doner</c><m>blah</m>";
+    scriptor::Element e1;
+    e1.channel = "doner";
+    e1.message = "blah";
+
+    scriptor::Processor proc;
+    const auto res1 = proc(data1.data(), data1.size());
+    ASSERT_EQ(1u, res1.size());
+    ASSERT_EQ(e1, res1[0]);
+
+    const std::string data2 = "<c>bar</c><m>foo</m>";
+    scriptor::Element e2;
+    e2.channel = "bar";
+    e2.message = "foo";
+
+    const auto res2 = proc(data2.data(), data2.size());
+    ASSERT_EQ(1u, res2.size());
+    ASSERT_EQ(e2, res2[0]);
+}
+
+TEST(processor, one_shot_with_two_elements) // fails
+{
+    const std::string data = "asfa<c>doner</c><m>guanchen</m>wfqfgvwev<c>bar</c><m>dani</m>wfqwf";
+    scriptor::Element e1;
+    e1.channel = "doner";
+    e1.message = "guanchen";
+    scriptor::Element e2;
+    e2.channel = "bar";
+    e2.message = "dani";
+    scriptor::Processor proc;
+    const auto res = proc(data.data(), data.size());
+    ASSERT_EQ(2u, res.size());
+    ASSERT_EQ(e1, res[0]);
+    ASSERT_EQ(e2, res[1]);
 }
 
 TEST(processor, one_shot_with_invalid_xml)
@@ -136,7 +175,7 @@ TEST(processor, one_shot_with_invalid_xml)
     const std::string data = "<c>doner</c><t<m>blah</m>";
     scriptor::Processor proc;
     const auto res = proc(data.data(), data.size());
-    ASSERT_FALSE(res);
+    ASSERT_EQ(0u, res.size());
 }
 
 TEST(processor, two_shots)
@@ -148,9 +187,10 @@ TEST(processor, two_shots)
     e.message = "blah";
     scriptor::Processor proc;
     const auto res1 = proc(data1.data(), data1.size());
-    ASSERT_FALSE(res1);
+    ASSERT_EQ(0u, res1.size());
     const auto res2 = proc(data2.data(), data2.size());
-    ASSERT_EQ(e, *res2);
+    ASSERT_EQ(1u, res2.size());
+    ASSERT_EQ(e, res2[0]);
 }
 
 TEST(processor, two_shots_with_crap_at_either_end)
@@ -162,9 +202,10 @@ TEST(processor, two_shots_with_crap_at_either_end)
     e.message = "blah";
     scriptor::Processor proc;
     const auto res1 = proc(data1.data(), data1.size());
-    ASSERT_FALSE(res1);
+    ASSERT_EQ(0u, res1.size());
     const auto res2 = proc(data2.data(), data2.size());
-    ASSERT_EQ(e, *res2);
+    ASSERT_EQ(1u, res2.size());
+    ASSERT_EQ(e, res2[0]);
 }
 
 TEST(processor, two_shots_with_weird_tags)
@@ -176,9 +217,10 @@ TEST(processor, two_shots_with_weird_tags)
     e.message = "blah";
     scriptor::Processor proc;
     const auto res1 = proc(data1.data(), data1.size());
-    ASSERT_FALSE(res1);
+    ASSERT_EQ(0u, res1.size());
     const auto res2 = proc(data2.data(), data2.size());
-    ASSERT_EQ(e, *res2);
+    ASSERT_EQ(1u, res2.size());
+    ASSERT_EQ(e, res2[0]);
 }
 
 int

@@ -4,6 +4,7 @@
 #include <fmt/core.h>
 
 #include <spdlog/sinks/rotating_file_sink.h>
+#include <spdlog/sinks/syslog_sink.h>
 #include <spdlog/sinks/systemd_sink.h>
 #include <spdlog/spdlog.h>
 
@@ -15,8 +16,34 @@ namespace scriptor
 Server::Server(const std::size_t n_threads, const std::string& file)
     : m_acceptor{m_ioc, aio::local::stream_protocol::endpoint{file}}
 {
-    accept();
+    // 1. Instantiate logging objects
+    const std::string ident = "FOOBAR";
 
+    spdlog::flush_on(spdlog::level::warn);
+
+    auto rotating_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
+        "/tmp/mylog.txt", 1024 * 1024 * 10, 3);
+    rotating_sink->set_level(spdlog::level::trace);
+    rotating_sink->set_pattern("[%Y-%m-%dT%H:%M:%S.%f] [%l] %v");
+
+    auto systemd_sink =
+        std::make_shared<spdlog::sinks::systemd_sink_mt>(ident, false);
+    systemd_sink->set_level(spdlog::level::trace);
+
+    auto syslog_sink = std::make_shared<spdlog::sinks::syslog_sink_mt>(
+        ident, LOG_PID, LOG_USER, false);
+    syslog_sink->set_level(spdlog::level::trace);
+
+    std::initializer_list<spdlog::sink_ptr> sinks{
+        rotating_sink, systemd_sink, syslog_sink};
+    m_logger = std::make_shared<spdlog::logger>("scriptor", sinks);
+    m_logger->set_level(spdlog::level::trace);
+
+    // 2. Setup consumer thread
+    m_log_thread = std::thread{[this] { worker(); }};
+
+    // 3. Setup producers
+    accept();
     while (m_ioc_threads.size() < n_threads)
     {
         std::thread thread;
@@ -40,35 +67,23 @@ Server::Server(const std::size_t n_threads, const std::string& file)
             throw;
         }
     }
-
-    spdlog::flush_on(spdlog::level::warn);
-
-    auto rotating_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
-        "/tmp/mylog.txt", 1024 * 1024 * 10, 3);
-    rotating_sink->set_level(spdlog::level::debug);
-    rotating_sink->set_pattern("[%Y-%m-%dT%H:%M:%S.%f] [%l] %v");
-
-    auto systemd_sink =
-        std::make_shared<spdlog::sinks::systemd_sink_mt>("scriptor");
-    systemd_sink->set_level(spdlog::level::debug);
-
-    std::initializer_list<spdlog::sink_ptr> sinks{rotating_sink, systemd_sink};
-    m_logger = std::make_shared<spdlog::logger>("scriptor", sinks);
-    m_logger->set_level(spdlog::level::debug);
-
-    m_log_thread = std::thread{[this] { worker(); }};
 }
 
 Server::~Server()
 {
-    m_logger->flush();
+    // 1. Shutdown producers
     shutdown();
+
+    // 2. Shutdown consumer
     {
         std::lock_guard lock(m_mutex);
         m_done = true;
     }
     m_cv.notify_one();
     m_log_thread.join();
+
+    // 3. Flush logger
+    m_logger->flush();
 }
 
 void
