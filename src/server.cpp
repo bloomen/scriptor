@@ -15,7 +15,8 @@ namespace scriptor
 {
 
 Server::Server(const Options& opt)
-    : m_acceptor{m_ioc, aio::local::stream_protocol::endpoint{opt.socket_file}}
+    : m_ioc{static_cast<int>(opt.n_threads)}
+    , m_acceptor{m_ioc, aio::local::stream_protocol::endpoint{opt.socket_file}}
 {
     // 1. Instantiate logging objects
     spdlog::flush_on(spdlog::level::warn);
