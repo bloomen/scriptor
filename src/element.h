@@ -11,11 +11,11 @@ namespace scriptor
 struct Element
 {
     std::string channel; // c
-    std::optional<spdlog::log_clock::time_point> time; // u
-    spdlog::level::level_enum log_level = spdlog::level::debug; // l
+    std::optional<spdlog::log_clock::time_point> time; // s
+    spdlog::level::level_enum level = spdlog::level::trace; // l
     std::string message; // m
-    std::string process_id; // p
-    std::string thread_id; // t
+    std::string process; // p
+    std::string thread; // t
     std::string filename; // f
     std::string line; // i
     std::string func; // n
@@ -28,10 +28,10 @@ struct Element
     {
         return std::tie(channel,
                         time,
-                        log_level,
+                        level,
                         message,
-                        process_id,
-                        thread_id,
+                        process,
+                        thread,
                         filename,
                         line,
                         func);

@@ -159,8 +159,8 @@ Server::worker()
                 const auto message =
                     fmt::format("[{0}] [{1}:{2}] [{3}:{4}:{5}] {6}",
                                 e.channel,
-                                e.process_id,
-                                e.thread_id,
+                                e.process,
+                                e.thread,
                                 e.filename,
                                 e.line,
                                 e.func,
@@ -168,7 +168,7 @@ Server::worker()
 
                 const auto time = e.time ? *e.time : spdlog::log_clock::now();
 
-                m_logger->log(time, spdlog::source_loc{}, e.log_level, message);
+                m_logger->log(time, spdlog::source_loc{}, e.level, message);
 
                 elements.pop();
             }

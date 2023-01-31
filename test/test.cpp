@@ -12,14 +12,14 @@
 
 TEST(element, from_xml_with_all_tags)
 {
-    const std::string xml = "<c>doner</c><t>123</t><l>2</l><p>456</p><u>123124141241</u><f>file.txt</f><i>99</i><n>foo()</n><m>blah</m>";
+    const std::string xml = "<c>doner</c><t>123</t><l>2</l><p>456</p><s>123124141241</s><f>file.txt</f><i>99</i><n>foo()</n><m>blah</m>";
     scriptor::Element e;
     e.channel = "doner";
-    e.time = spdlog::log_clock::time_point{std::chrono::microseconds{123124141241}};
-    e.log_level = spdlog::level::info;
+    e.time = spdlog::log_clock::time_point{std::chrono::seconds{123124141241}};
+    e.level = spdlog::level::info;
     e.message = "blah";
-    e.process_id = "456";
-    e.thread_id = "123";
+    e.process = "456";
+    e.thread = "123";
     e.filename = "file.txt";
     e.line = "99";
     e.func = "foo()";
@@ -55,7 +55,7 @@ TEST(element, from_xml_with_broken_xml)
 
 TEST(element, from_xml_with_broken_time)
 {
-    const std::string xml = "<c>doner</c><u>not_a_time</u><m>blah</m>";
+    const std::string xml = "<c>doner</c><s>not_a_time</s><m>blah</m>";
     ASSERT_ANY_THROW(scriptor::Element::from_xml(xml));
 }
 

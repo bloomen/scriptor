@@ -25,35 +25,36 @@ Element::from_xml(const std::string& xml)
     e.channel = tree.get_child("c").get_value<std::string>();
 
     // time
-    if (auto time_us = tree.get_child_optional("u"))
+    if (auto time = tree.get_child_optional("s"))
     {
-        const std::chrono::microseconds us{time_us->get_value<std::uint64_t>()};
-        e.time = spdlog::log_clock::time_point{us};
+        const std::chrono::microseconds ns{
+            static_cast<std::uint64_t>(time->get_value<double>() * 1e6)};
+        e.time = spdlog::log_clock::time_point{ns};
     }
 
-    // log level
-    if (auto log_level = tree.get_child_optional("l"))
+    // level
+    if (auto level = tree.get_child_optional("l"))
     {
-        const auto level = log_level->get_value<int>();
-        if (level >= spdlog::level::trace && level < spdlog::level::n_levels)
+        const auto lev = level->get_value<int>();
+        if (lev >= spdlog::level::trace && lev < spdlog::level::n_levels)
         {
-            e.log_level = static_cast<spdlog::level::level_enum>(level);
+            e.level = static_cast<spdlog::level::level_enum>(lev);
         }
     }
 
     // message
     e.message = tree.get_child("m").get_value<std::string>();
 
-    // process id
-    if (auto process_id = tree.get_child_optional("p"))
+    // process
+    if (auto process = tree.get_child_optional("p"))
     {
-        e.process_id = process_id->get_value<std::string>();
+        e.process = process->get_value<std::string>();
     }
 
-    // thread id
-    if (auto thread_id = tree.get_child_optional("t"))
+    // thread
+    if (auto thread = tree.get_child_optional("t"))
     {
-        e.thread_id = thread_id->get_value<std::string>();
+        e.thread = thread->get_value<std::string>();
     }
 
     // filename
