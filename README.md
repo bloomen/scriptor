@@ -38,11 +38,11 @@ $ ./scriptor --socket_file /tmp/scriptor.sock --identity myorg\
   --filelog_filename /tmp/filelog.txt --systemd_logging --systemd_level 2
 ```
 This starts a server listening for connections on the given file socket.
-Any number of clients can then connect and send logs in the following XML format:
+Any number of clients can then connect and send logs to scriptor. Each log
+is forwarded to both file and systemd. A log must follow this XML format:
 ```
 <c>channel_name</c><t>thread_id</t><p>process_id</p><u>time_us_since_epoch</u>\
   <f>filename</f><i>line_no</i><n>function_name</n><m>log_message</m>
 ```
 Note that only channel_name (`<c>`) and log_message (`<m>`) are mandatory and **must**
-be supplied at the start and end of the log, respectively. This example
-sends each log to both file and systemd.
+be supplied at the start and end of the log, respectively.
