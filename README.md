@@ -22,11 +22,11 @@ scriptor - A high-performance logger for Linux using unix file sockets:
   --help                                Display this help message
   --socket_file arg                     The unix socket filename (required)
   --identity arg (=scriptor)            The identity name
-  --filelog_filename arg                The filelog's filename
+  --filelog_filename arg                The filelog filename
   --filelog_max_file_size arg (=10485760)
-                                        The filelog's max file size
-  --filelog_max_files arg (=3)          The filelog's max files
-  --filelog_level arg (=0)              The filelog's level
+                                        The filelog max file size
+  --filelog_max_files arg (=3)          The filelog max files
+  --filelog_level arg (=0)              The filelog level
   --systemd_logging                     Enables logging to systemd
   --systemd_level arg (=0)              The systemd log level
   --syslog_logging                      Enables logging to syslog

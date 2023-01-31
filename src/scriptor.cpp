@@ -45,19 +45,19 @@ main(int argc, char** argv)
             // file logging
             ("filelog_filename",
              po::value<std::string>(&opt.file_sink_filename),
-             "The filelog's filename")(
+             "The filelog filename")(
                 "filelog_max_file_size",
                 po::value<std::size_t>(&opt.file_sink_max_file_size)
                     ->default_value(opt.file_sink_max_file_size),
-                "The filelog's max file size")(
+                "The filelog max file size")(
                 "filelog_max_files",
                 po::value<std::size_t>(&opt.file_sink_max_files)
                     ->default_value(opt.file_sink_max_files),
-                "The filelog's max files")(
+                "The filelog max files")(
                 "filelog_level",
                 po::value<int>(&opt.file_sink_log_level)
                     ->default_value(opt.file_sink_log_level),
-                "The filelog's level")
+                "The filelog level")
 
             // systemd logging
             ("systemd_logging",
