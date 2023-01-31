@@ -39,9 +39,9 @@ Processor::operator()(const char* const data, const std::size_t length)
     };
 
     std::vector<Element> elements;
-    while (auto e = find_one())
+    while (auto&& e = find_one())
     {
-        elements.push_back(*e);
+        elements.push_back(std::move(*e));
     }
     return elements;
 }
@@ -64,7 +64,10 @@ Session::read()
             {
                 auto&& elements =
                     self->m_processor(self->m_buffer.data(), length);
-                self->m_push(std::move(elements));
+                if (!elements.empty())
+                {
+                    self->m_push(std::move(elements));
+                }
                 self->read();
             }
         });
