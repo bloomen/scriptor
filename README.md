@@ -41,8 +41,13 @@ This starts a server listening for connections on the given file socket.
 Any number of clients can then connect and send logs to scriptor. Each log
 is forwarded to both file and systemd. A log must follow this XML format:
 ```
-<c>channel_name</c><t>thread_id</t><p>process_id</p><u>time_us_since_epoch</u>\
-  <f>filename</f><i>line_no</i><n>function_name</n><m>log_message</m>
+<c>channel_name</c><s>seconds_since_epoch</s><l>log_level</l><p>process</p>\
+  <t>thread</t><f>filename</f><i>line_no</i><n>function_name</n><m>log_message</m>
 ```
 Note that only channel_name (`<c>`) and log_message (`<m>`) are mandatory and **must**
-be supplied at the start and end of the log, respectively.
+be supplied at the start and end of the log, respectively. For a concrete example:
+```
+<c>myorg</c><s>1675153178.487972</s><l>1</l><p>5887</p><f>client.py</f>\
+  <i>48</i><n>compute()</n><m>hello there</m>
+```
+To see how to talk to scriptor from python check the `client.py` example code.
