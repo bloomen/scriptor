@@ -4,7 +4,7 @@
 #endif
 #if __GNUC__
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#pragma GCC diagnostic ignored "-Wuninitialized"
 #endif
 #include <boost/property_tree/xml_parser.hpp>
 #if __GNUC__

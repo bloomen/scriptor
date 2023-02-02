@@ -7,15 +7,15 @@ A high-performance logger using unix/tcp sockets.
 ## Build & Install
 
 ```
-sudo apt install libsystemd-dev  # Or similar for your distro
+sudo apt install libsystemd-dev  # If built for Linux
 python3 bootstrap.py  # Uses conan to install boost and spdlog to ~/.conan
 mkdir build && cd build
 cmake ..
 make -j
-```
-Optionally install and configure systemd service:
-```
 sudo make install
+```
+Optionally configure systemd service for Linux:
+```
 sudo cp ../systemd/scriptor.service /etc/systemd/system/
 sudo chmod 664 /etc/systemd/system/scriptor.service
 sudo systemctl daemon-reload
@@ -41,6 +41,8 @@ scriptor - A high-performance logger using unix/tcp sockets:
   --syslog_logging                      Enables logging to syslog (Linux only)
   --syslog_level arg (=0)               The syslog level
 ```
+Logging to systemd and syslog is only available on Linux.
+
 For instance:
 ```
 $ ./scriptor --socket_file /tmp/scriptor.sock --identity myorg\
