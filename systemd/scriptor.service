@@ -1,0 +1,8 @@
+[Unit]
+Description=Scriptor
+
+[Service]
+ExecStart=/usr/local/bin/scriptor --socket_file /tmp/scriptor.sock --filelog_filename /var/log/scriptor.log
+
+[Install]
+WantedBy=multi-user.target

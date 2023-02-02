@@ -4,7 +4,7 @@
 
 A high-performance logger for Linux using unix file sockets.
 
-## Build
+## Build & Install
 
 ```
 sudo apt install libsystemd-dev  # Or similar for your distro
@@ -13,6 +13,15 @@ mkdir build && cd build
 cmake ..
 make -j
 ```
+Optionally install and configure systemd service:
+```
+sudo make install
+sudo cp ../systemd/scriptor.service /etc/systemd/system/
+sudo chmod 664 /etc/systemd/system/scriptor.service
+sudo systemctl daemon-reload
+sudo systemctl start scriptor.service
+```
+You'd want to edit the `scriptor.service` file to fit your needs.
 
 ## Usage
 
@@ -35,7 +44,7 @@ scriptor - A high-performance logger for Linux using unix file sockets:
 For instance:
 ```
 $ ./scriptor --socket_file /tmp/scriptor.sock --identity myorg\
-  --filelog_filename /tmp/filelog.txt --systemd_logging --systemd_level 2
+  --filelog_filename /var/log/scriptor.log --systemd_logging --systemd_level 2
 ```
 This starts a server listening for connections on the given file socket.
 Any number of clients can then connect and send logs to scriptor. Each log
@@ -50,4 +59,4 @@ be supplied at the start and end of the log, respectively. For a concrete exampl
 <c>myorg</c><s>1675153178.487972</s><l>1</l><p>5887</p><f>client.py</f>\
   <i>48</i><n>compute()</n><m>hello there</m>
 ```
-To see how to talk to scriptor from python check the `client.py` example code.
+To see how to talk to scriptor from python check the `clients/client.py` example code.
