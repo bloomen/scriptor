@@ -73,7 +73,15 @@ def main():
             os.mkdir(cmake_dir)
         with open(os.path.join(cmake_dir, '{}.cmake'.format(build_type)), 'w') as f:
             f.write('include_directories({})\n'.format(' '.join(includedirs)))
+            print("includedirs=", includedirs)
+            for dir in includedirs:
+                print("includedir=", dir)
+                print("includedir.list=", os.listdir(dir))
             f.write('link_directories({})\n'.format(' '.join(libdirs)))
+            print("libdirs=", libdirs)
+            for dir in libdirs:
+                print("libdir=", dir)
+                print("libdir.list=", os.listdir(dir))
 
         garbage = [
             'conan.lock',

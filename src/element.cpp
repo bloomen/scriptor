@@ -1,4 +1,11 @@
+#if __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wconversion"
+#endif
 #include <boost/property_tree/xml_parser.hpp>
+#if __clang__
+#pragma clang diagnostic pop
+#endif
 
 #include "element.h"
 

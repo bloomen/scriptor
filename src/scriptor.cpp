@@ -8,7 +8,14 @@
 #include <filesystem>
 #include <iostream>
 
+#if __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
 #include <boost/program_options.hpp>
+#if __clang__
+#pragma clang diagnostic pop
+#endif
 
 #include "server.h"
 
