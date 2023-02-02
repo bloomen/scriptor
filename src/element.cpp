@@ -25,11 +25,11 @@ Element::from_xml(const std::string& xml)
     e.channel = tree.get_child("c").get_value<std::string>();
 
     // time
-    if (auto time = tree.get_child_optional("s"))
+    if (auto seconds = tree.get_child_optional("s"))
     {
-        const std::chrono::microseconds ns{
-            static_cast<std::uint64_t>(time->get_value<double>() * 1e6)};
-        e.time = spdlog::log_clock::time_point{ns};
+        const std::chrono::microseconds us{
+            static_cast<std::uint64_t>(seconds->get_value<double>() * 1e6)};
+        e.time = spdlog::log_clock::time_point{us};
     }
 
     // level
