@@ -2,7 +2,14 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wconversion"
 #endif
+#if __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
 #include <boost/property_tree/xml_parser.hpp>
+#if __GNUC__
+#pragma GCC diagnostic pop
+#endif
 #if __clang__
 #pragma clang diagnostic pop
 #endif
