@@ -22,7 +22,7 @@ jobs:
       - name: use msvc
         uses: ilammy/msvc-dev-cmd@v1
       - name: install libsystemd-dev on Linux
-        if: ${{ matrix.config == 'ubuntu-latest' }}
+        if: ${{ matrix.config }} == 'ubuntu-latest'
         run: |
           sudo apt install -y libsystemd-dev
       - name: run tests
