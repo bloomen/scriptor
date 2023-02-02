@@ -2,7 +2,7 @@
 
 [![Actions](https://github.com/bloomen/scriptor/actions/workflows/scriptor-tests.yml/badge.svg?branch=main)](https://github.com/bloomen/scriptor/actions/workflows/scriptor-tests.yml?query=branch%3Amain)
 
-A high-performance logger for Linux using unix file sockets.
+A high-performance logger using unix/tcp sockets.
 
 ## Build & Install
 
@@ -27,7 +27,7 @@ You'd want to edit the `scriptor.service` file to fit your needs.
 
 ```
 $ ./scriptor --help
-scriptor - A high-performance logger for Linux using unix file sockets:
+scriptor - A high-performance logger using unix/tcp sockets:
   --help                                Display this help message
   --socket_file arg                     The unix socket filename (required)
   --identity arg (=scriptor)            The identity name
@@ -36,9 +36,9 @@ scriptor - A high-performance logger for Linux using unix file sockets:
                                         The filelog max file size
   --filelog_max_files arg (=3)          The filelog max files
   --filelog_level arg (=0)              The filelog level
-  --systemd_logging                     Enables logging to systemd
+  --systemd_logging                     Enables logging to systemd (Linux only)
   --systemd_level arg (=0)              The systemd log level
-  --syslog_logging                      Enables logging to syslog
+  --syslog_logging                      Enables logging to syslog (Linux only)
   --syslog_level arg (=0)               The syslog level
 ```
 For instance:

@@ -5,8 +5,10 @@
 
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_sinks.h>
+#ifdef SCRIPTOR_LINUX
 #include <spdlog/sinks/syslog_sink.h>
 #include <spdlog/sinks/systemd_sink.h>
+#endif
 #include <spdlog/spdlog.h>
 
 #include "server.h"
@@ -36,6 +38,7 @@ Server::Server(const Options& opt)
         sinks.push_back(std::move(file_sink));
     }
 
+#ifdef SCRIPTOR_LINUX
     if (opt.systemd_sink_use)
     {
         auto systemd_sink = std::make_shared<spdlog::sinks::systemd_sink_mt>(
@@ -53,6 +56,7 @@ Server::Server(const Options& opt)
             static_cast<spdlog::level::level_enum>(opt.syslog_sink_log_level));
         sinks.push_back(std::move(syslog_sink));
     }
+#endif
 
     if (sinks.empty())
     {

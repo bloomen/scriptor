@@ -1,4 +1,4 @@
-// scriptor - A high-performance logger for Linux using unix file sockets
+// scriptor - A high-performance logger using unix/tcp sockets
 // Repo: https://github.com/bloomen/scriptor
 // Author: Christian Blume
 // License: MIT http://www.opensource.org/licenses/mit-license.php
@@ -32,8 +32,8 @@ main(int argc, char** argv)
     {
         Options opt;
 
-        po::options_description desc{"scriptor - A high-performance logger for "
-                                     "Linux using unix file sockets"};
+        po::options_description desc{"scriptor - A high-performance logger "
+                                     "using unix/tcp sockets"};
         desc.add_options()("help", "Display this help message")(
             "socket_file",
             po::value<std::string>(&opt.socket_file)->required(),
@@ -59,11 +59,12 @@ main(int argc, char** argv)
                     ->default_value(opt.file_sink_log_level),
                 "The filelog level")
 
+#ifdef SCRIPTOR_LINUX
             // systemd logging
             ("systemd_logging",
              po::bool_switch(&opt.systemd_sink_use)
                  ->default_value(opt.systemd_sink_use),
-             "Enables logging to systemd")(
+             "Enables logging to systemd (Linux only)")(
                 "systemd_level",
                 po::value<int>(&opt.systemd_sink_log_level)
                     ->default_value(opt.systemd_sink_log_level),
@@ -73,11 +74,13 @@ main(int argc, char** argv)
             ("syslog_logging",
              po::bool_switch(&opt.syslog_sink_use)
                  ->default_value(opt.syslog_sink_use),
-             "Enables logging to syslog")(
+             "Enables logging to syslog (Linux only)")(
                 "syslog_level",
                 po::value<int>(&opt.syslog_sink_log_level)
                     ->default_value(opt.syslog_sink_log_level),
-                "The syslog level");
+                "The syslog level")
+#endif
+            ;
 
         po::variables_map vm;
         po::store(po::parse_command_line(argc, argv, desc), vm);
