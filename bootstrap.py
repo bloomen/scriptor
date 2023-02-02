@@ -76,12 +76,12 @@ def main():
             print("includedirs=", includedirs)
             for dir in includedirs:
                 print("includedir=", dir)
-                print("includedir.list=", os.listdir(dir))
+                print("includedir.list=", os.listdir(dir.strip('"')))
             f.write('link_directories({})\n'.format(' '.join(libdirs)))
             print("libdirs=", libdirs)
             for dir in libdirs:
                 print("libdir=", dir)
-                print("libdir.list=", os.listdir(dir))
+                print("libdir.list=", os.listdir(dir.strip('"')))
 
         garbage = [
             'conan.lock',
