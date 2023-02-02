@@ -1,17 +1,15 @@
-#if __clang__
+#if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wconversion"
-#endif
-#if __GNUC__
+#elif defined(__GNUC__)
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuninitialized"
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
 #include <boost/property_tree/xml_parser.hpp>
-#if __GNUC__
-#pragma GCC diagnostic pop
-#endif
-#if __clang__
+#if defined(__clang__)
 #pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#pragma GCC diagnostic pop
 #endif
 
 #include "element.h"
