@@ -8,6 +8,9 @@
 namespace scriptor
 {
 
+void
+xml_unescape(std::string& xml);
+
 struct Element
 {
     std::string channel; // c

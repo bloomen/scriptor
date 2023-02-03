@@ -1,21 +1,72 @@
-#if defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wconversion"
-#elif defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif
-#include <boost/property_tree/xml_parser.hpp>
-#if defined(__clang__)
-#pragma clang diagnostic pop
-#elif defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
+#include <stdexcept>
+#include <tuple>
+#include <unordered_map>
+#include <vector>
+
+#include <fmt/core.h>
 
 #include "element.h"
 
 namespace scriptor
 {
+
+class XmlError : public std::exception
+{
+public:
+    const char*
+    what() const noexcept override
+    {
+        return "XML Error";
+    }
+};
+
+void
+xml_unescape(std::string& xml)
+{
+    static const std::vector<std::pair<std::string, char>> seq{
+        {"&amp;", '&'},
+        {"&quot;", '\"'},
+        {"&apos;", '\''},
+        {"&lt;", '<'},
+        {"&gt;", '>'},
+    };
+
+    auto i = xml.find('&');
+    if (i == std::string::npos)
+    {
+        return;
+    }
+
+    std::string res;
+    res.reserve(xml.size());
+    std::size_t prev = 0;
+    while (i != std::string::npos)
+    {
+        res.append(&xml[prev], i - prev);
+        prev = i;
+        for (const auto& p : seq)
+        {
+            if ((xml.size() - i) >= p.first.size() &&
+                std::equal(&xml[i], &xml[i] + p.first.size(), p.first.begin()))
+            {
+                res.push_back(p.second);
+                prev += p.first.size();
+                break;
+            }
+        }
+        if (prev == i)
+        {
+            res.push_back('&');
+            ++prev;
+        }
+        i = xml.find('&', prev);
+    }
+    if (prev < xml.size())
+    {
+        res.append(&xml[prev], xml.size() - prev);
+    }
+    xml = std::move(res);
+}
 
 bool
 Element::operator==(const Element& o) const
@@ -26,65 +77,109 @@ Element::operator==(const Element& o) const
 Element
 Element::from_xml(const std::string& xml)
 {
-    boost::property_tree::ptree tree;
-    std::stringstream ss;
-    ss << xml;
-    boost::property_tree::read_xml(ss, tree);
-
     Element e;
+    std::unordered_map<char, std::string> values;
 
-    // channel
-    e.channel = tree.get_child("c").get_value<std::string>();
+    auto cur = xml.find('<');
+    while (cur != std::string::npos && cur + 7 < xml.size())
+    {
+        const auto tag = xml[cur + 1];
+        if (xml[cur + 2] != '>')
+        {
+            break;
+        }
+        const auto start = cur + 3;
+        const auto token = fmt::format("</{}>", tag);
+        const auto end = xml.find('<', start);
+        if (end == std::string::npos)
+        {
+            break;
+        }
+        if (end + token.size() > xml.size())
+        {
+            break;
+        }
+        if (!std::equal(&xml[end], &xml[end] + token.size(), token.begin()))
+        {
+            break;
+        }
+        values[tag] = xml.substr(start, end - start);
+        cur = xml.find('<', end + token.size());
+    }
 
-    // time
-    if (auto seconds = tree.get_child_optional("s"))
+    auto c = values.find('c');
+    if (c != values.end())
+    {
+        e.channel = std::move(c->second);
+        xml_unescape(e.channel);
+    }
+    else
+    {
+        throw XmlError{};
+    }
+
+    auto s = values.find('s');
+    if (s != values.end())
     {
         const std::chrono::microseconds us{
-            static_cast<std::uint64_t>(seconds->get_value<double>() * 1e6)};
+            static_cast<std::uint64_t>(std::stod(s->second) * 1e6)};
         e.time = spdlog::log_clock::time_point{us};
     }
 
-    // level
-    if (auto level = tree.get_child_optional("l"))
+    auto l = values.find('l');
+    if (l != values.end())
     {
-        const auto lev = level->get_value<int>();
+        const auto lev = std::stoi(l->second);
         if (lev >= spdlog::level::trace && lev < spdlog::level::n_levels)
         {
             e.level = static_cast<spdlog::level::level_enum>(lev);
         }
     }
 
-    // message
-    e.message = tree.get_child("m").get_value<std::string>();
-
-    // process
-    if (auto process = tree.get_child_optional("p"))
+    auto m = values.find('m');
+    if (m != values.end())
     {
-        e.process = process->get_value<std::string>();
+        e.message = std::move(m->second);
+        xml_unescape(e.message);
+    }
+    else
+    {
+        throw XmlError{};
     }
 
-    // thread
-    if (auto thread = tree.get_child_optional("t"))
+    auto p = values.find('p');
+    if (p != values.end())
     {
-        e.thread = thread->get_value<std::string>();
+        e.process = std::move(p->second);
+        xml_unescape(e.process);
     }
 
-    // filename
-    if (auto filename = tree.get_child_optional("f"))
+    auto t = values.find('t');
+    if (t != values.end())
     {
-        e.filename = filename->get_value<std::string>();
+        e.thread = std::move(t->second);
+        xml_unescape(e.thread);
     }
 
-    // line
-    if (auto line = tree.get_child_optional("i"))
+    auto f = values.find('f');
+    if (f != values.end())
     {
-        e.line = line->get_value<std::string>();
+        e.filename = std::move(f->second);
+        xml_unescape(e.filename);
     }
 
-    // func
-    if (auto func = tree.get_child_optional("n"))
+    auto i = values.find('i');
+    if (i != values.end())
     {
-        e.func = func->get_value<std::string>();
+        e.line = std::move(i->second);
+        xml_unescape(e.line);
+    }
+
+    auto n = values.find('n');
+    if (n != values.end())
+    {
+        e.func = std::move(n->second);
+        xml_unescape(e.func);
     }
 
     return e;
