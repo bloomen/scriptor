@@ -11,6 +11,7 @@
 #if __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#pragma clang diagnostic ignored "-Wsign-conversion"
 #endif
 #include <boost/program_options.hpp>
 #if __clang__
