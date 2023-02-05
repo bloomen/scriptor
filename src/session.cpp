@@ -1,5 +1,7 @@
 #include "session.h"
 
+#include <optional>
+
 namespace scriptor
 {
 
