@@ -8,20 +8,11 @@
 #include <filesystem>
 #include <iostream>
 
-#if __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-#pragma clang diagnostic ignored "-Wsign-conversion"
-#endif
-#include <boost/program_options.hpp>
-#if __clang__
-#pragma clang diagnostic pop
-#endif
+#include "popl.hpp"
 
 #include "server.h"
 
 using namespace scriptor;
-namespace po = boost::program_options;
 
 std::atomic<int> g_signal{0};
 
@@ -36,70 +27,75 @@ main(int argc, char** argv)
 {
     std::signal(SIGINT, signal_handler);
     std::signal(SIGTERM, signal_handler);
+    popl::OptionParser op{
+        "scriptor - A high-performance logger using unix/tcp sockets"};
+    auto help = op.add<popl::Switch>("h", "help", "Display this help message");
     try
     {
         Options opt;
 
-        po::options_description desc{"scriptor - A high-performance logger "
-                                     "using unix/tcp sockets"};
-        desc.add_options()("help", "Display this help message")(
+        op.add<popl::Value<std::string>, popl::Attribute::required>(
+            "",
             "socket_file",
-            po::value<std::string>(&opt.socket_file)->required(),
-            "The unix socket filename (required)")(
-            "identity",
-            po::value<std::string>(&opt.identity)->default_value(opt.identity),
-            "The identity name")
+            "The unix socket filename (required)",
+            "",
+            &opt.socket_file);
+        op.add<popl::Value<std::string>>(
+            "", "identity", "The identity name", opt.identity, &opt.identity);
 
-            // file logging
-            ("filelog_filename",
-             po::value<std::string>(&opt.file_sink_filename),
-             "The filelog filename")(
-                "filelog_max_file_size",
-                po::value<std::size_t>(&opt.file_sink_max_file_size)
-                    ->default_value(opt.file_sink_max_file_size),
-                "The filelog max file size")(
-                "filelog_max_files",
-                po::value<std::size_t>(&opt.file_sink_max_files)
-                    ->default_value(opt.file_sink_max_files),
-                "The filelog max files")(
-                "filelog_level",
-                po::value<int>(&opt.file_sink_log_level)
-                    ->default_value(opt.file_sink_log_level),
-                "The filelog level")
+        // file logging
+        op.add<popl::Value<std::string>>("",
+                                         "filelog_filename",
+                                         "The filelog filename",
+                                         std::string{},
+                                         &opt.file_sink_filename);
+        op.add<popl::Value<std::size_t>>("",
+                                         "filelog_max_file_size",
+                                         "The filelog max file size",
+                                         opt.file_sink_max_file_size,
+                                         &opt.file_sink_max_file_size);
+        op.add<popl::Value<std::size_t>>("",
+                                         "file_sink_max_files",
+                                         "The filelog max files",
+                                         opt.file_sink_max_files,
+                                         &opt.file_sink_max_files);
+        op.add<popl::Value<int>>("",
+                                 "filelog_level",
+                                 "The filelog log level",
+                                 opt.file_sink_log_level,
+                                 &opt.file_sink_log_level);
 
 #ifdef SCRIPTOR_LINUX
-            // systemd logging
-            ("systemd_logging",
-             po::bool_switch(&opt.systemd_sink_use)
-                 ->default_value(opt.systemd_sink_use),
-             "Enables logging to systemd (Linux only)")(
-                "systemd_level",
-                po::value<int>(&opt.systemd_sink_log_level)
-                    ->default_value(opt.systemd_sink_log_level),
-                "The systemd log level")
+        // systemd logging
+        op.add<popl::Switch>("",
+                             "systemd_logging",
+                             "Enables logging to systemd (Linux only)",
+                             &opt.systemd_sink_use);
+        op.add<popl::Value<int>>("",
+                                 "systemd_level",
+                                 "The systemd log level",
+                                 opt.systemd_sink_log_level,
+                                 &opt.systemd_sink_log_level);
 
-            // syslog logging
-            ("syslog_logging",
-             po::bool_switch(&opt.syslog_sink_use)
-                 ->default_value(opt.syslog_sink_use),
-             "Enables logging to syslog (Linux only)")(
-                "syslog_level",
-                po::value<int>(&opt.syslog_sink_log_level)
-                    ->default_value(opt.syslog_sink_log_level),
-                "The syslog level")
+        // syslog logging
+        op.add<popl::Switch>("",
+                             "syslog_logging",
+                             "Enables logging to syslog (Linux only)",
+                             &opt.syslog_sink_use);
+        op.add<popl::Value<int>>("",
+                                 "syslog_level",
+                                 "The syslog log level",
+                                 opt.syslog_sink_log_level,
+                                 &opt.syslog_sink_log_level);
 #endif
-            ;
 
-        po::variables_map vm;
-        po::store(po::parse_command_line(argc, argv, desc), vm);
+        op.parse(argc, argv);
 
-        if (vm.count("help"))
+        if (help->count() >= 1)
         {
-            std::cout << desc << std::endl;
+            std::cout << op;
             return 0;
         }
-
-        po::notify(vm);
 
         if (std::filesystem::exists(opt.socket_file))
         {
@@ -111,6 +107,16 @@ main(int argc, char** argv)
         {
             std::this_thread::sleep_for(std::chrono::milliseconds{10});
         }
+    }
+    catch (const popl::invalid_option& e)
+    {
+        if (help->count() >= 1)
+        {
+            std::cout << op;
+            return 0;
+        }
+        std::cerr << "Fatal Error: " << e.what() << std::endl;
+        return 1;
     }
     catch (const std::exception& e)
     {
