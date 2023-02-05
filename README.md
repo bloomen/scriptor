@@ -8,7 +8,7 @@ A high-performance logger using unix/tcp sockets.
 
 ```
 sudo apt install libsystemd-dev  # If built for Linux
-python3 bootstrap.py  # Uses conan to install boost and spdlog to ~/.conan
+python3 bootstrap.py  # Uses conan to install asio and spdlog to ~/.conan
 mkdir build && cd build
 cmake ..
 make -j
