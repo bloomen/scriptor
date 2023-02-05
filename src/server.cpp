@@ -161,19 +161,7 @@ Server::worker()
             {
                 const auto& e = elements.front();
 
-                const auto message =
-                    fmt::format("[{0}] [{1}:{2}] [{3}:{4}:{5}] {6}",
-                                e.channel,
-                                e.process,
-                                e.thread,
-                                e.filename,
-                                e.line,
-                                e.func,
-                                e.message);
-
-                const auto time = e.time ? *e.time : spdlog::log_clock::now();
-
-                m_logger->log(time, spdlog::source_loc{}, e.level, message);
+                m_logger->log(e.time, spdlog::source_loc{}, e.level, e.message);
 
                 elements.pop();
             }

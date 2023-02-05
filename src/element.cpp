@@ -68,16 +68,19 @@ xml_unescape(std::string& xml)
     xml = std::move(res);
 }
 
-bool
-Element::operator==(const Element& o) const
-{
-    return make_tie() == o.make_tie();
-}
-
 Element
 Element::from_xml(const std::string& xml)
 {
-    Element e;
+    std::string channel; // c
+    spdlog::log_clock::time_point time; // s
+    spdlog::level::level_enum level = spdlog::level::trace; // l
+    std::string message; // m
+    std::string process; // p
+    std::string thread; // t
+    std::string filename; // f
+    std::string line; // i
+    std::string func; // n
+
     std::unordered_map<char, std::string> values;
 
     auto cur = xml.find('<');
@@ -110,8 +113,8 @@ Element::from_xml(const std::string& xml)
     auto c = values.find('c');
     if (c != values.end())
     {
-        e.channel = std::move(c->second);
-        xml_unescape(e.channel);
+        channel = std::move(c->second);
+        xml_unescape(channel);
     }
     else
     {
@@ -123,7 +126,11 @@ Element::from_xml(const std::string& xml)
     {
         const std::chrono::microseconds us{
             static_cast<std::uint64_t>(std::stod(s->second) * 1e6)};
-        e.time = spdlog::log_clock::time_point{us};
+        time = spdlog::log_clock::time_point{us};
+    }
+    else
+    {
+        time = spdlog::log_clock::now();
     }
 
     auto l = values.find('l');
@@ -132,15 +139,15 @@ Element::from_xml(const std::string& xml)
         const auto lev = std::stoi(l->second);
         if (lev >= spdlog::level::trace && lev < spdlog::level::n_levels)
         {
-            e.level = static_cast<spdlog::level::level_enum>(lev);
+            level = static_cast<spdlog::level::level_enum>(lev);
         }
     }
 
     auto m = values.find('m');
     if (m != values.end())
     {
-        e.message = std::move(m->second);
-        xml_unescape(e.message);
+        message = std::move(m->second);
+        xml_unescape(message);
     }
     else
     {
@@ -150,39 +157,48 @@ Element::from_xml(const std::string& xml)
     auto p = values.find('p');
     if (p != values.end())
     {
-        e.process = std::move(p->second);
-        xml_unescape(e.process);
+        process = std::move(p->second);
+        xml_unescape(process);
     }
 
     auto t = values.find('t');
     if (t != values.end())
     {
-        e.thread = std::move(t->second);
-        xml_unescape(e.thread);
+        thread = std::move(t->second);
+        xml_unescape(thread);
     }
 
     auto f = values.find('f');
     if (f != values.end())
     {
-        e.filename = std::move(f->second);
-        xml_unescape(e.filename);
+        filename = std::move(f->second);
+        xml_unescape(filename);
     }
 
     auto i = values.find('i');
     if (i != values.end())
     {
-        e.line = std::move(i->second);
-        xml_unescape(e.line);
+        line = std::move(i->second);
+        xml_unescape(line);
     }
 
     auto n = values.find('n');
     if (n != values.end())
     {
-        e.func = std::move(n->second);
-        xml_unescape(e.func);
+        func = std::move(n->second);
+        xml_unescape(func);
     }
 
-    return e;
+    auto msg = fmt::format("[{0}] [{1}:{2}] [{3}:{4}:{5}] {6}",
+                           channel,
+                           process,
+                           thread,
+                           filename,
+                           line,
+                           func,
+                           message);
+
+    return {std::move(time), level, std::move(msg)};
 }
 
 } // namespace scriptor

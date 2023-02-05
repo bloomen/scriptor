@@ -97,6 +97,7 @@ endif()
 
 set(scriptor_source_files
     ${PROJECT_SOURCE_DIR}/src/scriptor.cpp
+    ${PROJECT_SOURCE_DIR}/test/test.cpp
     ${scriptor_core_source_files})
 
 add_custom_target(
