@@ -28,18 +28,18 @@ You'd want to edit the `scriptor.service` file to fit your needs.
 ```
 $ ./scriptor --help
 scriptor - A high-performance logger using unix/tcp sockets:
-  --help                                Display this help message
-  --socket_file arg                     The unix socket filename (required)
-  --identity arg (=scriptor)            The identity name
-  --filelog_filename arg                The filelog filename
+  -h, --help                          Display this help message
+  --socket_file arg                   The unix socket filename (required)
+  --identity arg (=scriptor)          The identity name
+  --filelog_filename arg              The filelog filename
   --filelog_max_file_size arg (=10485760)
-                                        The filelog max file size
-  --filelog_max_files arg (=3)          The filelog max files
-  --filelog_level arg (=0)              The filelog level
-  --systemd_logging                     Enables logging to systemd (Linux only)
-  --systemd_level arg (=0)              The systemd log level
-  --syslog_logging                      Enables logging to syslog (Linux only)
-  --syslog_level arg (=0)               The syslog level
+                                      The filelog max file size
+  --file_sink_max_files arg (=3)      The filelog max files
+  --filelog_level arg (=0)            The filelog log level
+  --systemd_logging                   Enables logging to systemd (Linux only)
+  --systemd_level arg (=0)            The systemd log level
+  --syslog_logging                    Enables logging to syslog (Linux only)
+  --syslog_level arg (=0)             The syslog log level
 ```
 Logging to systemd and syslog is only available on Linux.
 
