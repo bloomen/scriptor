@@ -25,7 +25,8 @@ void
 Logger::push(const std::vector<Element>& elements)
 {
     std::lock_guard lock{m_mutex};
-    m_elements = elements;
+    m_elements.reserve(m_elements.size() + elements.size());
+    m_elements.insert(m_elements.end(), elements.begin(), elements.end());
     m_cv.notify_one();
 }
 
@@ -33,7 +34,11 @@ void
 Logger::push(std::vector<Element>&& elements)
 {
     std::lock_guard lock{m_mutex};
-    m_elements = std::move(elements);
+    m_elements.reserve(m_elements.size() + elements.size());
+    for (auto&& e : elements)
+    {
+        m_elements.emplace_back(std::move(e));
+    }
     m_cv.notify_one();
 }
 
