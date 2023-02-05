@@ -100,6 +100,30 @@ TEST(element, from_xml_with_only_required)
     ASSERT_EQ(exp.message, res.message);
 }
 
+TEST(element, from_xml_with_fractional_time)
+{
+    const std::string xml = "<c>doner</c><s>12345.567</s><m>blah</m>";
+    spdlog::log_clock::time_point time{std::chrono::seconds{12345}};
+    time += std::chrono::microseconds{567000};
+    const scriptor::Element exp{
+        time, spdlog::level::trace, "[doner] [:] [::] blah"};
+    const auto res = scriptor::Element::from_xml(xml);
+    ASSERT_EQ(exp.level, res.level);
+    ASSERT_EQ(exp.message, res.message);
+}
+
+TEST(element, from_xml_with_fractional_time2)
+{
+    const std::string xml = "<c>doner</c><s>12345.5678901</s><m>blah</m>";
+    spdlog::log_clock::time_point time{std::chrono::seconds{12345}};
+    time += std::chrono::microseconds{567890};
+    const scriptor::Element exp{
+        time, spdlog::level::trace, "[doner] [:] [::] blah"};
+    const auto res = scriptor::Element::from_xml(xml);
+    ASSERT_EQ(exp.level, res.level);
+    ASSERT_EQ(exp.message, res.message);
+}
+
 TEST(element, from_xml_with_escaped_xml)
 {
     const std::string xml = "<c>do&amp;ner</c><m>bl&lt;ah</m>";

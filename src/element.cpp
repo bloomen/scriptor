@@ -1,4 +1,4 @@
-#include <stdexcept>
+﻿#include <stdexcept>
 #include <tuple>
 #include <unordered_map>
 #include <vector>
@@ -124,9 +124,10 @@ Element::from_xml(const std::string& xml)
     auto s = values.find('s');
     if (s != values.end())
     {
-        const std::chrono::microseconds us{
-            static_cast<std::uint64_t>(std::stod(s->second) * 1e6)};
-        time = spdlog::log_clock::time_point{us};
+        const auto duration =
+            std::chrono::duration_cast<std::chrono::microseconds>(
+                std::chrono::duration<double>{std::stod(s->second)});
+        time = spdlog::log_clock::time_point{duration};
     }
     else
     {
