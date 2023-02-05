@@ -32,4 +32,3 @@ jobs:
           cmake --build . -j 4 --config ${{ matrix.config }}
           ctest --verbose
           ./scriptor --help
-
