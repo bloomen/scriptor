@@ -42,6 +42,11 @@ main(int argc, char** argv)
             &opt.socket_file);
         op.add<popl::Value<std::string>>(
             "", "identity", "The identity name", opt.identity, &opt.identity);
+        op.add<popl::Value<std::size_t>>("",
+                                         "threads",
+                                         "The number of producer threads",
+                                         opt.n_threads,
+                                         &opt.n_threads);
 
         // file logging
         op.add<popl::Value<std::string>>("",

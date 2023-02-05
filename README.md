@@ -31,6 +31,7 @@ scriptor - A high-performance logger using unix/tcp sockets:
   -h, --help                          Display this help message
   --socket_file arg                   The unix socket filename (required)
   --identity arg (=scriptor)          The identity name
+  --threads arg (=4)                  The number of producer threads
   --filelog_filename arg              The filelog filename
   --filelog_max_file_size arg (=10485760)
                                       The filelog max file size
