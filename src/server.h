@@ -50,9 +50,9 @@ private:
     void
     shutdown();
 
-    aio::io_context m_ioc;
+    asio::io_context m_ioc;
     std::vector<std::thread> m_ioc_threads;
-    aio::local::stream_protocol::acceptor m_acceptor;
+    asio::local::stream_protocol::acceptor m_acceptor;
     bool m_done{false};
     std::thread m_log_thread;
     std::condition_variable m_cv;

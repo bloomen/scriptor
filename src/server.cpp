@@ -18,7 +18,7 @@ namespace scriptor
 
 Server::Server(const Options& opt)
     : m_ioc{static_cast<int>(opt.n_threads)}
-    , m_acceptor{m_ioc, aio::local::stream_protocol::endpoint{opt.socket_file}}
+    , m_acceptor{m_ioc, asio::local::stream_protocol::endpoint{opt.socket_file}}
 {
     // 1. Instantiate logging objects
     spdlog::flush_on(spdlog::level::warn);
@@ -120,24 +120,24 @@ Server::~Server()
 void
 Server::accept()
 {
-    m_acceptor.async_accept([this](
-                                const boost::system::error_code ec,
-                                aio::local::stream_protocol::socket&& socket) {
-        if (!ec)
-        {
-            std::make_shared<Session>(std::move(socket),
-                                      [this](std::vector<Element>&& elements) {
-                                          std::lock_guard lock{m_mutex};
-                                          for (auto&& e : elements)
-                                          {
-                                              m_queue.emplace(std::move(e));
-                                          }
-                                          m_cv.notify_one();
-                                      })
-                ->read();
-        }
-        accept();
-    });
+    m_acceptor.async_accept(
+        [this](const auto ec, asio::local::stream_protocol::socket&& socket) {
+            if (!ec)
+            {
+                std::make_shared<Session>(
+                    std::move(socket),
+                    [this](std::vector<Element>&& elements) {
+                        std::lock_guard lock{m_mutex};
+                        for (auto&& e : elements)
+                        {
+                            m_queue.emplace(std::move(e));
+                        }
+                        m_cv.notify_one();
+                    })
+                    ->read();
+            }
+            accept();
+        });
 }
 
 void
