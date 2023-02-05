@@ -1,4 +1,4 @@
-#include <filesystem>
+﻿#include <filesystem>
 #include <iostream>
 
 #include <fmt/core.h>
@@ -20,60 +20,50 @@ Server::Server(const Options& opt)
     : m_ioc{static_cast<int>(opt.n_threads)}
     , m_acceptor{m_ioc, asio::local::stream_protocol::endpoint{opt.socket_file}}
 {
-    // 1. Instantiate logging objects
-    spdlog::flush_on(spdlog::level::warn);
+    // Setup loggers
     const std::string pattern = "[%Y-%m-%dT%H:%M:%S.%f] [%l] %v";
-
-    std::vector<spdlog::sink_ptr> sinks;
 
     if (!opt.file_sink_filename.empty())
     {
-        auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
+        auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_st>(
             opt.file_sink_filename,
             opt.file_sink_max_file_size,
             opt.file_sink_max_files);
         file_sink->set_level(
             static_cast<spdlog::level::level_enum>(opt.file_sink_log_level));
         file_sink->set_pattern(pattern);
-        sinks.push_back(std::move(file_sink));
+        m_loggers.emplace_back(std::move(file_sink));
     }
 
 #ifdef SCRIPTOR_LINUX
     if (opt.systemd_sink_use)
     {
-        auto systemd_sink = std::make_shared<spdlog::sinks::systemd_sink_mt>(
+        auto systemd_sink = std::make_shared<spdlog::sinks::systemd_sink_st>(
             opt.identity, false);
         systemd_sink->set_level(
             static_cast<spdlog::level::level_enum>(opt.systemd_sink_log_level));
-        sinks.push_back(std::move(systemd_sink));
+        m_loggers.emplace_back(std::move(systemd_sink));
     }
 
     if (opt.syslog_sink_use)
     {
-        auto syslog_sink = std::make_shared<spdlog::sinks::syslog_sink_mt>(
+        auto syslog_sink = std::make_shared<spdlog::sinks::syslog_sink_st>(
             opt.identity, LOG_PID, LOG_USER, false);
         syslog_sink->set_level(
             static_cast<spdlog::level::level_enum>(opt.syslog_sink_log_level));
-        sinks.push_back(std::move(syslog_sink));
+        m_loggers.emplace_back(std::move(syslog_sink));
     }
 #endif
 
-    if (sinks.empty())
+    if (m_loggers.empty())
     {
-        auto console_sink = std::make_shared<spdlog::sinks::stdout_sink_mt>();
+        auto console_sink = std::make_shared<spdlog::sinks::stdout_sink_st>();
         console_sink->set_level(spdlog::level::trace);
         console_sink->set_pattern(pattern);
-        sinks.push_back(std::move(console_sink));
+        m_loggers.emplace_back(std::move(console_sink));
     }
 
-    m_logger = std::make_shared<spdlog::logger>(
-        "scriptor", sinks.begin(), sinks.end());
-    m_logger->set_level(spdlog::level::trace);
-
-    // 2. Setup consumer thread
-    m_log_thread = std::thread{[this] { worker(); }};
-
-    // 3. Setup producers
+    // Setup producers
     accept();
     while (m_ioc_threads.size() < opt.n_threads)
     {
@@ -102,19 +92,11 @@ Server::Server(const Options& opt)
 
 Server::~Server()
 {
-    // 3. Shutdown producers
+    // Shutdown producers
     shutdown();
 
-    // 2. Shutdown consumer
-    {
-        std::lock_guard lock(m_mutex);
-        m_done = true;
-    }
-    m_cv.notify_one();
-    m_log_thread.join();
-
-    // 1. Flush logger
-    m_logger->flush();
+    // Shutdown consumers
+    m_loggers.clear();
 }
 
 void
@@ -127,55 +109,22 @@ Server::accept()
                 std::make_shared<Session>(
                     std::move(socket),
                     [this](std::vector<Element>&& elements) {
-                        std::lock_guard lock{m_mutex};
-                        for (auto&& e : elements)
+                        if (m_loggers.size() == 1)
                         {
-                            m_queue.emplace(std::move(e));
+                            m_loggers.front().push(std::move(elements));
                         }
-                        m_cv.notify_one();
+                        else
+                        {
+                            for (auto& logger : m_loggers)
+                            {
+                                logger.push(elements);
+                            }
+                        }
                     })
                     ->read();
             }
             accept();
         });
-}
-
-void
-Server::worker()
-{
-    for (;;)
-    {
-        std::queue<Element> elements;
-        {
-            std::unique_lock lock(m_mutex);
-            m_cv.wait(lock, [this] { return m_done || !m_queue.empty(); });
-            if (m_done)
-            {
-                break;
-            }
-            std::swap(elements, m_queue);
-        }
-        try
-        {
-            while (!elements.empty())
-            {
-                const auto& e = elements.front();
-
-                m_logger->log(e.time, spdlog::source_loc{}, e.level, e.message);
-
-                elements.pop();
-            }
-            m_logger->flush();
-        }
-        catch (const std::exception& e)
-        {
-            std::cerr << "Server Error: " << e.what() << std::endl;
-        }
-        catch (...)
-        {
-            std::cerr << "Server Error: Unknown" << std::endl;
-        }
-    }
 }
 
 void

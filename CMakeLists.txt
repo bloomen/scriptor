@@ -21,7 +21,7 @@ endif()
 function(scriptor_add_flags target)
     set_property(TARGET ${target} PROPERTY CXX_STANDARD 17)
     set_property(TARGET ${target} PROPERTY CXX_EXTENSIONS OFF)
-    target_compile_definitions(${target} PRIVATE SPDLOG_FMT_EXTERNAL)
+    target_compile_definitions(${target} PRIVATE SPDLOG_FMT_EXTERNAL SPDLOG_NO_THREAD_ID)
     if(MSVC)
         target_compile_definitions(${target} PRIVATE SCRIPTOR_WINDOWS _CRT_SECURE_NO_WARNINGS)
         target_compile_options(${target} PRIVATE /W4 /WX /bigobj /EHsc /wd4503 /wd4996 /wd4702 /wd4100 /wd4706)
@@ -67,6 +67,8 @@ set(scriptor_core_source_files
     ${PROJECT_SOURCE_DIR}/src/aio.h
     ${PROJECT_SOURCE_DIR}/src/element.h
     ${PROJECT_SOURCE_DIR}/src/element.cpp
+    ${PROJECT_SOURCE_DIR}/src/logger.h
+    ${PROJECT_SOURCE_DIR}/src/logger.cpp
     ${PROJECT_SOURCE_DIR}/src/server.h
     ${PROJECT_SOURCE_DIR}/src/server.cpp
     ${PROJECT_SOURCE_DIR}/src/session.h
