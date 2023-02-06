@@ -38,7 +38,7 @@ class ScriptorHandler(logging.Handler):
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-handler = ScriptorHandler("127.0.0.1", 12345, "myorg")
+handler = ScriptorHandler("127.0.0.1", 12345, "analysis")
 handler.setLevel(logging.DEBUG)
 
 logger.addHandler(handler)

@@ -37,7 +37,7 @@ class ScriptorHandler(logging.Handler):
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-handler = ScriptorHandler("/tmp/scriptor.sock", "myorg")
+handler = ScriptorHandler("/tmp/scriptor.sock", "analysis")
 handler.setLevel(logging.DEBUG)
 
 logger.addHandler(handler)
