@@ -38,11 +38,11 @@ scriptor - A high-performance logger using unix/tcp sockets:
   --filelog_max_file_size arg (=10485760)
                                       The filelog max file size
   --file_sink_max_files arg (=3)      The filelog max files
-  --filelog_level arg (=0)            The filelog log level
+  --filelog_level arg (=0)            The filelog log level (0>=level<=5)
   --systemd_logging                   Enables logging to systemd (Linux only)
-  --systemd_level arg (=0)            The systemd log level
+  --systemd_level arg (=0)            The systemd log level (0>=level<=5)
   --syslog_logging                    Enables logging to syslog (Linux only)
-  --syslog_level arg (=0)             The syslog log level
+  --syslog_level arg (=0)             The syslog log level (0>=level<=5)
 ```
 Logging to systemd and syslog is only available on Linux.
 
@@ -53,15 +53,15 @@ $ ./scriptor --socket_file /tmp/scriptor.sock --identity myorg\
 ```
 This starts a server listening for connections on the given file socket.
 Any number of clients can then connect and send logs to scriptor. Each log
-is forwarded to both file and systemd. A log must follow this XML format:
+is forwarded to both file and systemd. A log must follow this JSON format:
 ```
-<c>channel_name</c><s>seconds_since_epoch</s><l>log_level</l><p>process</p>\
-  <t>thread</t><f>filename</f><i>line_no</i><n>function_name</n><m>log_message</m>
+{"c":"channel_name","s":seconds_since_epoch,"l":log_level,"p":process_id,\
+    "t":thread_id,"f":"filename","i":line_no,"n":"function","m":"message"}
 ```
-Note that only channel_name (`<c>`) and log_message (`<m>`) are mandatory and **must**
-be supplied at the start and end of the log, respectively. For a concrete example:
+None of the fields are mandatory. For a concrete example:
 ```
-<c>myorg</c><s>1675153178.487972</s><l>1</l><p>5887</p><f>client.py</f>\
-  <i>48</i><n>compute()</n><m>hello there</m>
+{"c":"analysis","s":1675153178.487972,"l":1,"p":5887,\
+    "f":"client.py","i":48,"n":"compute()","m":"hello there"}
 ```
-To see how to talk to scriptor from python check the `clients/client.py` example code.
+The log level is a number between 0 (trace) and 5 (critical).
+To see how to talk to scriptor from python check the examples under the `clients` directory.

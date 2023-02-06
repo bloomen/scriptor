@@ -75,7 +75,7 @@ main(int argc, char** argv)
                                          &opt.file_sink_max_files);
         op.add<popl::Value<int>>("",
                                  "filelog_level",
-                                 "The filelog log level",
+                                 "The filelog log level (0>=level<=5)",
                                  opt.file_sink_log_level,
                                  &opt.file_sink_log_level);
 
@@ -87,7 +87,7 @@ main(int argc, char** argv)
                              &opt.systemd_sink_use);
         op.add<popl::Value<int>>("",
                                  "systemd_level",
-                                 "The systemd log level",
+                                 "The systemd log level (0>=level<=5)",
                                  opt.systemd_sink_log_level,
                                  &opt.systemd_sink_log_level);
 
@@ -98,7 +98,7 @@ main(int argc, char** argv)
                              &opt.syslog_sink_use);
         op.add<popl::Value<int>>("",
                                  "syslog_level",
-                                 "The syslog log level",
+                                 "The syslog log level (0>=level<=5)",
                                  opt.syslog_sink_log_level,
                                  &opt.syslog_sink_log_level);
 #endif
