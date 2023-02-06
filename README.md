@@ -3,6 +3,8 @@
 [![Actions](https://github.com/bloomen/scriptor/actions/workflows/scriptor-tests.yml/badge.svg?branch=main)](https://github.com/bloomen/scriptor/actions/workflows/scriptor-tests.yml?query=branch%3Amain)
 
 A high-performance logger using unix/tcp sockets.
+Requires a C++17 compliant compiler.
+Tested with Clang, GCC, and Visual Studio.
 
 ## Build & Install
 
