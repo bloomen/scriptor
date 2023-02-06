@@ -18,8 +18,10 @@ namespace scriptor
 
 Server::Server(const Options& opt)
     : m_ioc{static_cast<int>(opt.n_threads)}
-    , m_acceptor{m_ioc, asio::local::stream_protocol::endpoint{opt.socket_file}}
 {
+    m_acceptor = make_acceptor(
+        m_ioc, opt.socket_file, opt.socket_address, opt.socket_port);
+
     // Setup loggers
     const std::string pattern = "[%Y-%m-%dT%H:%M:%S.%f] [%l] %v";
 
@@ -102,8 +104,8 @@ Server::~Server()
 void
 Server::accept()
 {
-    m_acceptor.async_accept(
-        [this](const auto ec, asio::local::stream_protocol::socket&& socket) {
+    m_acceptor->async_accept(
+        [this](const auto ec, std::unique_ptr<Socket>&& socket) {
             if (!ec)
             {
                 std::make_shared<Session>(

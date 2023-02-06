@@ -48,7 +48,7 @@ Processor::operator()(const char* const data, const std::size_t length)
     return elements;
 }
 
-Session::Session(asio::local::stream_protocol::socket&& socket,
+Session::Session(std::unique_ptr<Socket>&& socket,
                  std::function<void(std::vector<Element>&&)> push)
     : m_socket{std::move(socket)}
     , m_push{std::move(push)}
@@ -59,19 +59,19 @@ void
 Session::read()
 {
     auto self = shared_from_this();
-    m_socket.async_read_some(asio::buffer(m_buffer),
-                             [self](const auto ec, const std::size_t length) {
-                                 if (!ec)
-                                 {
-                                     auto&& elements = self->m_processor(
-                                         self->m_buffer.data(), length);
-                                     if (!elements.empty())
-                                     {
-                                         self->m_push(std::move(elements));
-                                     }
-                                     self->read();
-                                 }
-                             });
+    m_socket->async_read_some(asio::buffer(m_buffer),
+                              [self](const auto ec, const std::size_t length) {
+                                  if (!ec)
+                                  {
+                                      auto&& elements = self->m_processor(
+                                          self->m_buffer.data(), length);
+                                      if (!elements.empty())
+                                      {
+                                          self->m_push(std::move(elements));
+                                      }
+                                      self->read();
+                                  }
+                              });
 }
 
 } // namespace scriptor

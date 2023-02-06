@@ -34,12 +34,21 @@ main(int argc, char** argv)
     {
         Options opt;
 
-        op.add<popl::Value<std::string>, popl::Attribute::required>(
-            "",
-            "socket_file",
-            "The unix socket filename (required)",
-            "",
-            &opt.socket_file);
+        op.add<popl::Value<std::string>>("",
+                                         "socket_file",
+                                         "The unix socket filename",
+                                         "",
+                                         &opt.socket_file);
+        op.add<popl::Value<std::string>>("",
+                                         "socket_address",
+                                         "The tcp socket address",
+                                         "",
+                                         &opt.socket_address);
+        op.add<popl::Value<asio::ip::port_type>>("",
+                                                 "socket_port",
+                                                 "The tcp socket port",
+                                                 opt.socket_port,
+                                                 &opt.socket_port);
         op.add<popl::Value<std::string>>(
             "", "identity", "The identity name", opt.identity, &opt.identity);
         op.add<popl::Value<std::size_t>>("",

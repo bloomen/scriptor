@@ -65,6 +65,8 @@ find_package(Threads)
 
 set(scriptor_core_source_files
     ${PROJECT_SOURCE_DIR}/src/aio.h
+    ${PROJECT_SOURCE_DIR}/src/acceptor.h
+    ${PROJECT_SOURCE_DIR}/src/acceptor.cpp
     ${PROJECT_SOURCE_DIR}/src/element.h
     ${PROJECT_SOURCE_DIR}/src/element.cpp
     ${PROJECT_SOURCE_DIR}/src/logger.h
@@ -73,6 +75,8 @@ set(scriptor_core_source_files
     ${PROJECT_SOURCE_DIR}/src/server.cpp
     ${PROJECT_SOURCE_DIR}/src/session.h
     ${PROJECT_SOURCE_DIR}/src/session.cpp
+    ${PROJECT_SOURCE_DIR}/src/socket.h
+    ${PROJECT_SOURCE_DIR}/src/socket.cpp
 )
 
 add_library(scriptor_core ${scriptor_core_source_files})

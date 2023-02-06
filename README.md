@@ -29,7 +29,9 @@ You'd want to edit the `scriptor.service` file to fit your needs.
 $ ./scriptor --help
 scriptor - A high-performance logger using unix/tcp sockets:
   -h, --help                          Display this help message
-  --socket_file arg                   The unix socket filename (required)
+  --socket_file arg                   The unix socket filename
+  --socket_address arg                The tcp socket address
+  --socket_port arg (=12345)          The tcp socket port
   --identity arg (=scriptor)          The identity name
   --threads arg (=4)                  The number of producer threads
   --filelog_filename arg              The filelog filename

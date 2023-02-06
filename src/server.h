@@ -4,6 +4,7 @@
 
 #include <spdlog/logger.h>
 
+#include "acceptor.h"
 #include "logger.h"
 #include "session.h"
 
@@ -13,6 +14,8 @@ namespace scriptor
 struct Options
 {
     std::string socket_file;
+    std::string socket_address;
+    asio::ip::port_type socket_port = 12345;
     std::string identity = "scriptor";
     std::size_t n_threads = std::thread::hardware_concurrency();
     std::string file_sink_filename;
@@ -47,7 +50,7 @@ private:
 
     asio::io_context m_ioc;
     std::vector<std::thread> m_ioc_threads;
-    asio::local::stream_protocol::acceptor m_acceptor;
+    std::unique_ptr<Acceptor> m_acceptor;
     std::list<Logger> m_loggers;
 };
 

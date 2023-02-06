@@ -8,6 +8,7 @@
 
 #include "aio.h"
 #include "element.h"
+#include "socket.h"
 
 namespace scriptor
 {
@@ -34,7 +35,7 @@ private:
 class Session : public std::enable_shared_from_this<Session>
 {
 public:
-    Session(asio::local::stream_protocol::socket&& socket,
+    Session(std::unique_ptr<Socket>&& socket,
             std::function<void(std::vector<Element>&&)> push);
 
     Session(const Session&) = delete;
@@ -48,7 +49,7 @@ public:
     read();
 
 private:
-    asio::local::stream_protocol::socket m_socket;
+    std::unique_ptr<Socket> m_socket;
     std::array<char, 1024> m_buffer;
     std::function<void(std::vector<Element>&&)> m_push;
     Processor m_processor;
