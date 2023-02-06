@@ -7,14 +7,14 @@ A high-performance logger using unix/tcp sockets.
 ## Build & Install
 
 ```
-sudo apt install libsystemd-dev  # If built for Linux
-python3 bootstrap.py  # Uses conan to install asio and spdlog to ~/.conan
+sudo apt install libsystemd-dev  # If built for Linux. Adjust for your distro
+python3 bootstrap.py  # Uses conan to install asio, nlohmann_json, spdlog to ~/.conan
 mkdir build && cd build
 cmake ..
 make -j
 sudo make install
 ```
-Optionally configure systemd service for Linux:
+Optionally configure the systemd service for Linux:
 ```
 sudo cp ../systemd/scriptor.service /etc/systemd/system/
 sudo chmod 664 /etc/systemd/system/scriptor.service
@@ -58,7 +58,8 @@ is forwarded to both file and systemd. A log must follow this JSON format:
 {"c":"channel_name","s":seconds_since_epoch,"l":log_level,"p":process_id,\
     "t":thread_id,"f":"filename","i":line_no,"n":"function","m":"message"}
 ```
-None of the fields are mandatory. For a concrete example:
+None of the fields are mandatory but a log must start with a `{` and
+end with a `}`. For a concrete example:
 ```
 {"c":"analysis","s":1675153178.487972,"l":1,"p":5887,\
     "f":"client.py","i":48,"n":"compute()","m":"hello there"}
