@@ -7,9 +7,6 @@
 namespace scriptor
 {
 
-void
-xml_unescape(std::string& xml);
-
 struct Element
 {
     spdlog::log_clock::time_point time;
@@ -17,7 +14,7 @@ struct Element
     std::string message;
 
     static Element
-    from_xml(const std::string& xml);
+    from_json(const std::string& str);
 };
 
 } // namespace scriptor

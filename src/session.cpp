@@ -8,8 +8,8 @@ namespace scriptor
 namespace
 {
 
-const std::string start = "<c>";
-const std::string end = "</m>";
+const std::string start = "{";
+const std::string end = "}";
 
 } // namespace
 
@@ -25,15 +25,18 @@ Processor::operator()(const char* const data, const std::size_t length)
             const auto ie = m_current.find(end, is);
             if (ie != std::string::npos)
             {
-                const auto xml = m_current.substr(is, ie - is + end.size());
+                const auto str = m_current.substr(is, ie - is + end.size());
                 m_current = m_current.substr(ie + end.size());
                 try
                 {
-                    return Element::from_xml(xml);
+                    return Element::from_json(str);
                 }
-                catch (...)
+                catch (std::exception& e)
                 {
-                    // invalid xml - ignore.
+                    return Element{
+                        spdlog::log_clock::now(),
+                        spdlog::level::critical,
+                        fmt::format("Scriptor Json Parse Error: {}", e.what())};
                 }
             }
         }
