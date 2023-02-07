@@ -92,19 +92,26 @@ target_link_libraries(scriptor scriptor_core)
 
 install(TARGETS scriptor RUNTIME DESTINATION bin)
 
+set(scriptor_test_source_files
+    ${PROJECT_SOURCE_DIR}/test/helper.h
+    ${PROJECT_SOURCE_DIR}/test/main.cpp
+    ${PROJECT_SOURCE_DIR}/test/test_element.cpp
+    ${PROJECT_SOURCE_DIR}/test/test_logger.cpp
+    ${PROJECT_SOURCE_DIR}/test/test_processor.cpp
+)
+
 if(scriptor_build_tests)
     enable_testing()
-    add_executable(scriptor_test test/test.cpp)
+    add_executable(scriptor_test ${scriptor_test_source_files})
     scriptor_add_flags(scriptor_test)
-    target_include_directories(scriptor_test PRIVATE src)
     target_link_libraries(scriptor_test scriptor_core gtest$<$<CONFIG:Debug>:d>)
     add_test(scriptor_test scriptor_test)
 endif()
 
 set(scriptor_source_files
     ${PROJECT_SOURCE_DIR}/src/scriptor.cpp
-    ${PROJECT_SOURCE_DIR}/test/test.cpp
-    ${scriptor_core_source_files})
+    ${scriptor_core_source_files}
+    ${scriptor_test_source_files})
 
 add_custom_target(
     scriptor_format

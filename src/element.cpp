@@ -91,4 +91,10 @@ Element::from_json(const std::string& str)
     return {std::move(time), level, std::move(message)};
 }
 
+bool
+Element::operator==(const Element& o) const
+{
+    return time == o.time && level == o.level && message == o.message;
+}
+
 } // namespace scriptor

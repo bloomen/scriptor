@@ -15,6 +15,9 @@ struct Element
 
     static Element
     from_json(const std::string& str);
+
+    bool
+    operator==(const Element& o) const;
 };
 
 } // namespace scriptor
