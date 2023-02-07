@@ -37,6 +37,20 @@ TEST(scriptor, get_help)
     ASSERT_NE(text.find("Display this help message"), std::string::npos);
 }
 
+TEST(scriptor, get_help_with_short_arg)
+{
+    std::vector<char*> argv{
+        (char*)"scriptor",
+        (char*)"-h",
+    };
+    std::stringstream buffer;
+    cout_redirect cr{buffer.rdbuf()};
+    const auto code = scriptor::run(static_cast<int>(argv.size()), argv.data());
+    ASSERT_EQ(0, code);
+    const std::string text = buffer.str();
+    ASSERT_NE(text.find("Display this help message"), std::string::npos);
+}
+
 // TEST(scriptor, run_using_unix_socket)
 //{
 //    std::vector<char*> argv{
