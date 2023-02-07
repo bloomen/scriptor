@@ -1,32 +1,31 @@
-// scriptor - A high-performance logger using unix/tcp sockets
-// Repo: https://github.com/bloomen/scriptor
-// Author: Christian Blume
-// License: MIT http://www.opensource.org/licenses/mit-license.php
-
 #include <atomic>
-#include <csignal>
 #include <filesystem>
 #include <iostream>
 
 #include "popl.hpp"
 
+#include "scriptor.h"
 #include "server.h"
 
-using namespace scriptor;
+namespace scriptor
+{
+
+namespace
+{
 
 std::atomic<int> g_signal{0};
 
+}
+
 void
-signal_handler(int signal)
+stop(const int signal)
 {
     g_signal = signal;
 }
 
 int
-main(int argc, char** argv)
+run(int argc, char** argv)
 {
-    std::signal(SIGINT, signal_handler);
-    std::signal(SIGTERM, signal_handler);
     popl::OptionParser op{
         "scriptor - A high-performance logger using unix/tcp sockets"};
     auto help = op.add<popl::Switch>("h", "help", "Display this help message");
@@ -144,3 +143,5 @@ main(int argc, char** argv)
     }
     return 0;
 }
+
+} // namespace scriptor

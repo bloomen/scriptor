@@ -71,6 +71,8 @@ set(scriptor_core_source_files
     ${PROJECT_SOURCE_DIR}/src/element.cpp
     ${PROJECT_SOURCE_DIR}/src/logger.h
     ${PROJECT_SOURCE_DIR}/src/logger.cpp
+    ${PROJECT_SOURCE_DIR}/src/scriptor.h
+    ${PROJECT_SOURCE_DIR}/src/scriptor.cpp
     ${PROJECT_SOURCE_DIR}/src/server.h
     ${PROJECT_SOURCE_DIR}/src/server.cpp
     ${PROJECT_SOURCE_DIR}/src/session.h
@@ -86,7 +88,7 @@ if(UNIX AND NOT APPLE)
     target_link_libraries(scriptor_core systemd)
 endif()
 
-add_executable(scriptor src/scriptor.cpp)
+add_executable(scriptor src/main.cpp)
 scriptor_add_flags(scriptor)
 target_link_libraries(scriptor scriptor_core)
 
@@ -98,6 +100,7 @@ set(scriptor_test_source_files
     ${PROJECT_SOURCE_DIR}/test/test_element.cpp
     ${PROJECT_SOURCE_DIR}/test/test_logger.cpp
     ${PROJECT_SOURCE_DIR}/test/test_processor.cpp
+    ${PROJECT_SOURCE_DIR}/test/test_scriptor.cpp
 )
 
 if(scriptor_build_tests)
