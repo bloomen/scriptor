@@ -19,6 +19,9 @@
 #include "../src/aio.h"
 
 void
+set_utc();
+
+void
 send_to_unix_socket(const std::string& socket_file, const std::string& message);
 
 void

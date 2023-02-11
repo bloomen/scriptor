@@ -103,8 +103,8 @@ test_scriptor_run(bool tcp)
         std::filesystem::remove(socket_file);
     }
     const std::string exp =
-        R"([1779-10-09T12:57:50.18446744073708584755] [info] [doner] [456:123] [file.txt:99:foo] blah
-[2023-01-31T21:19:38.487972] [warning] [analysis] [5887:] [client.py:48:compute] hello there
+        R"([1779-10-09T01:18:46.18446744073708584755] [info] [doner] [456:123] [file.txt:99:foo] blah
+[2023-01-31T08:19:38.487972] [warning] [analysis] [5887:] [client.py:48:compute] hello there
 )";
     const auto content = read_from_file(filelog_filename);
     ASSERT_EQ(exp, content);

@@ -1,4 +1,18 @@
+#include <stdlib.h>
+#include <time.h>
+
 #include "helper.h"
+
+void
+set_utc()
+{
+#ifdef SCRIPTOR_WINDOWS
+
+#else
+    setenv("TZ", "UTC", 1);
+    tzset();
+#endif
+}
 
 void
 send_to_unix_socket(const std::string& socket_file, const std::string& message)
