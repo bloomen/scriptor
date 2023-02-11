@@ -56,7 +56,7 @@ void
 test_scriptor_run(bool tcp)
 {
     const std::string message1 =
-        R"({"c":"doner","s":"123124141241","l":"2","p":"456","t":"123","f":"file.txt","i":99,"n":"foo","m":"blah"})";
+        R"({"c":"doner","s":"1253370013","l":"2","p":"456","t":"123","f":"file.txt","i":99,"n":"foo","m":"blah"})";
     const std::string message2 =
         R"({"c":"analysis","s":1675153178.487972,"l":3,"p":5887,"f":"client.py","i":48,"n":"compute","m":"hello there"})";
     const auto socket_file = random_string(10);
@@ -103,7 +103,7 @@ test_scriptor_run(bool tcp)
         std::filesystem::remove(socket_file);
     }
     const std::string exp =
-        R"([1779-10-09T01:18:46.18446744073708584755] [info] [doner] [456:123] [file.txt:99:foo] blah
+        R"([2009-09-19T14:20:13.000000] [info] [doner] [456:123] [file.txt:99:foo] blah
 [2023-01-31T08:19:38.487972] [warning] [analysis] [5887:] [client.py:48:compute] hello there
 )";
     const auto content = read_from_file(filelog_filename);
