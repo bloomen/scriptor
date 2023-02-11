@@ -153,10 +153,12 @@ test_scriptor_run(bool tcp)
     std::filesystem::remove(filelog_filename);
 }
 
+#ifndef SCRIPTOR_APPLE
 TEST(scriptor, run_using_unix_socket)
 {
     test_scriptor_run(false);
 }
+#endif
 
 TEST(scriptor, run_using_tcp_socket)
 {
