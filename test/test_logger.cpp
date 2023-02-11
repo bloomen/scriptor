@@ -29,17 +29,16 @@ public:
         std::lock_guard lock{mutex};
         std::string message{msg.payload.begin(), msg.payload.end()};
         elements.push_back({msg.time, msg.level, std::move(message)});
+        ++log_count;
+        if (log_count == count)
+        {
+            promise.set_value();
+        }
     }
 
     void
     flush() override
     {
-        std::lock_guard lock{mutex};
-        ++flush_count;
-        if (flush_count == count)
-        {
-            promise.set_value();
-        }
     }
 
     void
@@ -60,20 +59,13 @@ public:
         return elements;
     }
 
-    std::size_t
-    get_flush_count() const
-    {
-        std::lock_guard lock{mutex};
-        return flush_count;
-    }
-
 private:
     std::size_t count;
     std::promise<void> promise;
     std::future<void> future;
     mutable std::mutex mutex;
     std::vector<scriptor::Element> elements;
-    std::size_t flush_count = 0;
+    std::size_t log_count = 0;
 };
 
 } // namespace
@@ -93,7 +85,6 @@ TEST(logger, sink_receives_two_elements)
     logger.push(elements);
     sink->wait();
     ASSERT_EQ(elements, sink->get_elements());
-    ASSERT_EQ(2u, sink->get_flush_count());
 }
 
 TEST(logger, sink_receives_two_elements_but_at_error_level)
@@ -113,7 +104,6 @@ TEST(logger, sink_receives_two_elements_but_at_error_level)
     logger.push(elements);
     sink->wait();
     ASSERT_EQ(expected, sink->get_elements());
-    ASSERT_EQ(1u, sink->get_flush_count());
 }
 
 TEST(logger, sink_receives_two_elements_rvalue)
@@ -127,12 +117,11 @@ TEST(logger, sink_receives_two_elements_rvalue)
             spdlog::log_clock::now(), spdlog::level::warn, "other message"},
     };
     const auto expected = elements;
-    auto sink = std::make_shared<MockSink>(1);
+    auto sink = std::make_shared<MockSink>(elements.size());
     scriptor::Logger logger{sink};
     logger.push(std::move(elements));
     sink->wait();
     ASSERT_EQ(expected, sink->get_elements());
-    ASSERT_EQ(1u, sink->get_flush_count());
 }
 
 TEST(logger, sink_receives_six_elements)
@@ -145,7 +134,7 @@ TEST(logger, sink_receives_six_elements)
         scriptor::Element{
             spdlog::log_clock::now(), spdlog::level::warn, "other message"},
     };
-    auto sink = std::make_shared<MockSink>(3);
+    auto sink = std::make_shared<MockSink>(6);
     scriptor::Logger logger{sink};
     logger.push(elements);
     logger.push(elements);
@@ -160,5 +149,4 @@ TEST(logger, sink_receives_six_elements)
         elements[1],
     };
     ASSERT_EQ(expected, sink->get_elements());
-    ASSERT_EQ(3u, sink->get_flush_count());
 }

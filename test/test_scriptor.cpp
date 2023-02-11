@@ -166,8 +166,7 @@ test_scriptor_run(const bool tcp, const int log_level)
     std::filesystem::remove(filelog_filename);
 }
 
-// TODO Why does this fail on Mac?
-#ifdef SCRIPTOR_LINUX
+#ifndef SCRIPTOR_WINDOWS
 TEST(scriptor, run_using_unix_socket_at_info_level)
 {
     test_scriptor_run(false, 2);

@@ -60,6 +60,7 @@ Logger::worker()
         }
         try
         {
+            std::size_t count = 0;
             for (const auto& e : elements)
             {
                 if (!m_sink->should_log(e.level))
@@ -72,10 +73,11 @@ Logger::worker()
                                                    e.level,
                                                    e.message};
                 m_sink->log(msg);
-                if (e.level >= spdlog::level::warn)
-                {
-                    m_sink->flush();
-                }
+                ++count;
+            }
+            if (count > 0)
+            {
+                m_sink->flush();
             }
         }
         catch (const std::exception& e)
