@@ -96,6 +96,7 @@ install(TARGETS scriptor RUNTIME DESTINATION bin)
 
 set(scriptor_test_source_files
     ${PROJECT_SOURCE_DIR}/test/helper.h
+    ${PROJECT_SOURCE_DIR}/test/helper.cpp
     ${PROJECT_SOURCE_DIR}/test/main.cpp
     ${PROJECT_SOURCE_DIR}/test/test_element.cpp
     ${PROJECT_SOURCE_DIR}/test/test_logger.cpp

@@ -26,6 +26,7 @@ stop(const int signal)
 int
 run(int argc, char** argv)
 {
+    g_signal = 0;
     popl::OptionParser op{
         "scriptor - A high-performance logger using unix/tcp sockets"};
     auto help = op.add<popl::Switch>("h", "help", "Display this help message");
@@ -36,12 +37,12 @@ run(int argc, char** argv)
         op.add<popl::Value<std::string>>("",
                                          "socket_file",
                                          "The unix socket filename",
-                                         "",
+                                         opt.socket_file,
                                          &opt.socket_file);
         op.add<popl::Value<std::string>>("",
                                          "socket_address",
                                          "The tcp socket address",
-                                         "",
+                                         opt.socket_address,
                                          &opt.socket_address);
         op.add<popl::Value<asio::ip::port_type>>("",
                                                  "socket_port",
@@ -60,7 +61,7 @@ run(int argc, char** argv)
         op.add<popl::Value<std::string>>("",
                                          "filelog_filename",
                                          "The filelog filename",
-                                         std::string{},
+                                         opt.file_sink_filename,
                                          &opt.file_sink_filename);
         op.add<popl::Value<std::size_t>>("",
                                          "filelog_max_file_size",
