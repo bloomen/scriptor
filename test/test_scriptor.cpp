@@ -133,7 +133,7 @@ test_scriptor_run(bool tcp)
             std::this_thread::sleep_for(std::chrono::milliseconds{200});
             send_to_unix_socket(socket_file, message2);
         }
-        std::this_thread::sleep_for(std::chrono::seconds{1});
+        std::this_thread::sleep_for(std::chrono::seconds{2});
         scriptor::stop(SIGINT);
         std::this_thread::sleep_for(std::chrono::seconds{1});
     }};
