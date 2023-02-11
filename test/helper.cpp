@@ -7,7 +7,7 @@ void
 set_utc()
 {
 #ifdef SCRIPTOR_WINDOWS
-
+    // TODO find the equivalent for Windows
 #else
     setenv("TZ", "UTC", 1);
     tzset();
