@@ -14,27 +14,6 @@ set_utc()
 #endif
 }
 
-void
-send_to_unix_socket(const std::string& socket_file, const std::string& message)
-{
-    asio::io_context ioc;
-    asio::local::stream_protocol::socket socket{ioc};
-    const asio::local::stream_protocol::endpoint endpoint{socket_file};
-    socket.connect(endpoint);
-    asio::write(socket, asio::buffer(message));
-}
-
-void
-send_to_tcp_socket(const asio::ip::port_type port, const std::string& message)
-{
-    asio::io_context ioc;
-    asio::ip::tcp::socket socket{ioc};
-    const asio::ip::tcp::endpoint endpoint{
-        asio::ip::address::from_string("127.0.0.1"), port};
-    socket.connect(endpoint);
-    asio::write(socket, asio::buffer(message));
-}
-
 std::string
 random_string(std::string::size_type length)
 {

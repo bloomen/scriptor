@@ -96,6 +96,7 @@ TEST(scriptor, with_invalid_option)
 void
 test_scriptor_run(const bool tcp, const int log_level)
 {
+    asio::io_context ioc;
     const std::string message1 =
         R"({"c":"doner","s":"1253370013","l":"2","p":"456","t":"123","f":"file.txt","i":99,"n":"foo","m":"blah"})";
     const std::string message2 =
@@ -122,23 +123,29 @@ test_scriptor_run(const bool tcp, const int log_level)
         argv.push_back((char*)"--socket_file");
         argv.push_back((char*)socket_file.c_str());
     }
-    std::thread thread{[tcp, &socket_file, port, &message1, &message2] {
+    std::thread thread{[&ioc, tcp, &socket_file, port, &message1, &message2] {
         std::this_thread::sleep_for(std::chrono::seconds{1});
         if (tcp)
         {
-            send_to_tcp_socket(port, message1);
+            asio::ip::tcp::socket socket{ioc};
+            const asio::ip::tcp::endpoint endpoint{
+                asio::ip::address::from_string("127.0.0.1"), port};
+            socket.connect(endpoint);
+            socket.send(asio::buffer(message1), 0);
             std::this_thread::sleep_for(std::chrono::milliseconds{200});
-            send_to_tcp_socket(port, message2);
+            socket.send(asio::buffer(message2), 0);
         }
         else
         {
-            send_to_unix_socket(socket_file, message1);
+            asio::local::stream_protocol::socket socket{ioc};
+            const asio::local::stream_protocol::endpoint endpoint{socket_file};
+            socket.connect(endpoint);
+            socket.send(asio::buffer(message1), 0);
             std::this_thread::sleep_for(std::chrono::milliseconds{200});
-            send_to_unix_socket(socket_file, message2);
+            socket.send(asio::buffer(message2), 0);
         }
-        std::this_thread::sleep_for(std::chrono::seconds{2});
-        scriptor::stop(SIGINT);
         std::this_thread::sleep_for(std::chrono::seconds{1});
+        scriptor::stop(SIGINT);
     }};
     const auto code = scriptor::run(static_cast<int>(argv.size()), argv.data());
     ASSERT_EQ(0, code);

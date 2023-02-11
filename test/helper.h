@@ -21,12 +21,6 @@
 void
 set_utc();
 
-void
-send_to_unix_socket(const std::string& socket_file, const std::string& message);
-
-void
-send_to_tcp_socket(const asio::ip::port_type port, const std::string& message);
-
 std::string
 random_string(std::string::size_type length);
 
