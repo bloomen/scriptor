@@ -94,7 +94,7 @@ TEST(scriptor, with_invalid_option)
 }
 
 void
-test_scriptor_run(bool tcp)
+test_scriptor_run(const bool tcp, const int log_level)
 {
     const std::string message1 =
         R"({"c":"doner","s":"1253370013","l":"2","p":"456","t":"123","f":"file.txt","i":99,"n":"foo","m":"blah"})";
@@ -104,9 +104,12 @@ test_scriptor_run(bool tcp)
     const asio::ip::port_type port = 12346;
     const std::string port_str = std::to_string(port);
     const auto filelog_filename = random_string(10);
+    const auto log_level_str = std::to_string(log_level);
     std::vector<char*> argv{(char*)"scriptor",
                             (char*)"--filelog_filename",
-                            (char*)filelog_filename.c_str()};
+                            (char*)filelog_filename.c_str(),
+                            (char*)"--filelog_level",
+                            (char*)log_level_str.c_str()};
     if (tcp)
     {
         argv.push_back((char*)"--socket_address");
@@ -144,23 +147,43 @@ test_scriptor_run(bool tcp)
     {
         std::filesystem::remove(socket_file);
     }
-    const std::string exp =
-        R"([2009-09-19T14:20:13.000000] [info] [doner] [456:123] [file.txt:99:foo] blah
+    std::string exp;
+    if (log_level <= 2)
+    {
+        exp =
+            R"([2009-09-19T14:20:13.000000] [info] [doner] [456:123] [file.txt:99:foo] blah
 [2023-01-31T08:19:38.487972] [warning] [analysis] [5887:] [client.py:48:compute] hello there
 )";
+    }
+    else
+    {
+        exp =
+            R"([2023-01-31T08:19:38.487972] [warning] [analysis] [5887:] [client.py:48:compute] hello there
+)";
+    }
     const auto content = read_from_file(filelog_filename);
     ASSERT_EQ(exp, content);
     std::filesystem::remove(filelog_filename);
 }
 
-#ifndef SCRIPTOR_APPLE
-TEST(scriptor, run_using_unix_socket)
+#ifdef SCRIPTOR_LINUX
+TEST(scriptor, run_using_unix_socket_at_info_level)
 {
-    test_scriptor_run(false);
+    test_scriptor_run(false, 2);
+}
+
+TEST(scriptor, run_using_unix_socket_at_warning_level)
+{
+    test_scriptor_run(false, 3);
 }
 #endif
 
-TEST(scriptor, run_using_tcp_socket)
+TEST(scriptor, run_using_tcp_socket_at_info_level)
 {
-    test_scriptor_run(true);
+    test_scriptor_run(true, 2);
+}
+
+TEST(scriptor, run_using_tcp_socket_at_warning_level)
+{
+    test_scriptor_run(true, 3);
 }

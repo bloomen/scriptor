@@ -62,6 +62,10 @@ Logger::worker()
         {
             for (const auto& e : elements)
             {
+                if (!m_sink->should_log(e.level))
+                {
+                    continue;
+                }
                 const spdlog::details::log_msg msg{e.time,
                                                    spdlog::source_loc{},
                                                    spdlog::string_view_t{},

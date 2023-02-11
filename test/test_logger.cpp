@@ -96,6 +96,26 @@ TEST(logger, sink_receives_two_elements)
     ASSERT_EQ(2u, sink->get_flush_count());
 }
 
+TEST(logger, sink_receives_two_elements_but_at_error_level)
+{
+    const std::vector<scriptor::Element> elements{
+        scriptor::Element{
+            spdlog::log_clock::time_point{std::chrono::seconds{123124141241}},
+            spdlog::level::warn,
+            "[doner] [456:123] [file.txt:99:foo] blah"},
+        scriptor::Element{
+            spdlog::log_clock::now(), spdlog::level::err, "other message"},
+    };
+    const std::vector<scriptor::Element> expected = {elements[1]};
+    auto sink = std::make_shared<MockSink>(1);
+    sink->set_level(spdlog::level::err);
+    scriptor::Logger logger{sink};
+    logger.push(elements);
+    sink->wait();
+    ASSERT_EQ(expected, sink->get_elements());
+    ASSERT_EQ(1u, sink->get_flush_count());
+}
+
 TEST(logger, sink_receives_two_elements_rvalue)
 {
     std::vector<scriptor::Element> elements{
