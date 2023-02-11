@@ -22,6 +22,23 @@ private:
     std::streambuf* m_buffer;
 };
 
+class CerrRedirect
+{
+public:
+    explicit CerrRedirect(std::streambuf* const new_buffer)
+        : m_buffer(std::cerr.rdbuf(new_buffer))
+    {
+    }
+
+    ~CerrRedirect()
+    {
+        std::cerr.rdbuf(m_buffer);
+    }
+
+private:
+    std::streambuf* m_buffer;
+};
+
 } // namespace
 
 TEST(scriptor, get_help)
@@ -50,6 +67,30 @@ TEST(scriptor, get_help_with_short_arg)
     ASSERT_EQ(0, code);
     const std::string text = buffer.str();
     ASSERT_NE(text.find("Display this help message"), std::string::npos);
+}
+
+TEST(scriptor, with_no_options)
+{
+    std::vector<char*> argv{
+        (char*)"scriptor",
+    };
+    std::stringstream buffer;
+    CerrRedirect cr{buffer.rdbuf()};
+    const auto code = scriptor::run(static_cast<int>(argv.size()), argv.data());
+    ASSERT_EQ(1, code);
+}
+
+TEST(scriptor, with_invalid_option)
+{
+    std::vector<char*> argv{(char*)"scriptor",
+                            (char*)"--socket_address",
+                            (char*)"some_file",
+                            (char*)"--socket_port",
+                            (char*)"invalid_port"};
+    std::stringstream buffer;
+    CerrRedirect cr{buffer.rdbuf()};
+    const auto code = scriptor::run(static_cast<int>(argv.size()), argv.data());
+    ASSERT_EQ(1, code);
 }
 
 void
@@ -94,6 +135,7 @@ test_scriptor_run(bool tcp)
         }
         std::this_thread::sleep_for(std::chrono::seconds{1});
         scriptor::stop(SIGINT);
+        std::this_thread::sleep_for(std::chrono::seconds{1});
     }};
     const auto code = scriptor::run(static_cast<int>(argv.size()), argv.data());
     ASSERT_EQ(0, code);
