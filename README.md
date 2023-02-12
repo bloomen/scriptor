@@ -6,6 +6,17 @@ A high-performance logger using unix/tcp sockets.
 Requires a C++17 compliant compiler.
 Tested with Clang, GCC, and Visual Studio.
 
+## Architecture
+
+![architecture](https://raw.githubusercontent.com/bloomen/scriptor/main/architecture.png)
+
+scriptor currently supports the following loggers:
+
+* Rotating file
+* Systemd (Linux only)
+* Syslog (Linux only)
+* Windows EventLog (Windows only)
+
 ## Build & Install
 
 ```
