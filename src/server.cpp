@@ -9,6 +9,9 @@
 #include <spdlog/sinks/syslog_sink.h>
 #include <spdlog/sinks/systemd_sink.h>
 #endif
+#ifdef SCRIPTOR_WINDOWS
+#include <spdlog/sinks/win_eventlog_sink.h>
+#endif
 #include <spdlog/spdlog.h>
 
 #include "server.h"
@@ -55,6 +58,17 @@ Server::Server(const Options& opt)
         syslog_sink->set_level(
             static_cast<spdlog::level::level_enum>(opt.syslog_sink_log_level));
         m_loggers.emplace_back(std::move(syslog_sink));
+    }
+#endif
+
+#ifdef SCRIPTOR_WINDOWS
+    if (opt.eventlog_sink_use)
+    {
+        auto eventlog_sink =
+            std::make_shared<spdlog::sinks::win_eventlog_sink_st>(opt.identity);
+        eventlog_sink->set_level(static_cast<spdlog::level::level_enum>(
+            opt.eventlog_sink_log_level));
+        m_loggers.emplace_back(std::move(eventlog_sink));
     }
 #endif
 

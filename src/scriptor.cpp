@@ -79,7 +79,6 @@ run(int argc, char** argv)
                                  opt.file_sink_log_level,
                                  &opt.file_sink_log_level);
 
-#ifdef SCRIPTOR_LINUX
         // systemd logging
         op.add<popl::Switch>("",
                              "systemd_logging",
@@ -101,7 +100,17 @@ run(int argc, char** argv)
                                  "The syslog log level (0>=level<=5)",
                                  opt.syslog_sink_log_level,
                                  &opt.syslog_sink_log_level);
-#endif
+
+        // eventlog logging
+        op.add<popl::Switch>("",
+                             "eventlog_logging",
+                             "Enables logging to eventlog (Windows only)",
+                             &opt.eventlog_sink_use);
+        op.add<popl::Value<int>>("",
+                                 "eventlog_level",
+                                 "The eventlog log level (0>=level<=5)",
+                                 opt.eventlog_sink_log_level,
+                                 &opt.eventlog_sink_log_level);
 
         op.parse(argc, argv);
 

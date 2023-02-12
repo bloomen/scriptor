@@ -26,6 +26,8 @@ struct Options
     int systemd_sink_log_level = spdlog::level::trace;
     bool syslog_sink_use = false;
     int syslog_sink_log_level = spdlog::level::trace;
+    bool eventlog_sink_use = false;
+    int eventlog_sink_log_level = spdlog::level::trace;
 };
 
 class Server
