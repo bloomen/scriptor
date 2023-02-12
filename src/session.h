@@ -29,7 +29,7 @@ public:
     operator()(const char* data, std::size_t length);
 
 private:
-    std::string m_current;
+    std::vector<char> m_current;
 };
 
 class Session : public std::enable_shared_from_this<Session>

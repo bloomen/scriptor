@@ -1,5 +1,6 @@
 #include "session.h"
 
+#include <algorithm>
 #include <optional>
 
 namespace scriptor
@@ -8,33 +9,33 @@ namespace scriptor
 namespace
 {
 
-const std::string start = "{";
-const std::string end = "}";
+constexpr char start = '{';
+constexpr char end = '}';
 
 } // namespace
 
 std::vector<Element>
 Processor::operator()(const char* const data, const std::size_t length)
 {
-    m_current.append(data, length);
+    m_current.insert(m_current.end(), data, data + length);
 
     auto find_one = [this]() -> std::optional<Element> {
-        const auto is = m_current.find(start);
-        if (is != std::string::npos)
+        const auto is = std::find(m_current.begin(), m_current.end(), start);
+        if (is != m_current.end())
         {
-            const auto ie = m_current.find(end, is);
-            if (ie != std::string::npos)
+            const auto ie = std::find(is + 1, m_current.end(), end);
+            if (ie != m_current.end())
             {
+                const auto beyond = ie + 1;
                 try
                 {
-                    auto e = Element::from_json(&m_current[is],
-                                                &m_current[ie + end.size()]);
-                    m_current = m_current.substr(ie + end.size());
-                    return e;
+                    auto element = Element::from_json(&*is, &*beyond);
+                    m_current.erase(m_current.begin(), beyond);
+                    return element;
                 }
                 catch (std::exception& e)
                 {
-                    m_current = m_current.substr(ie + end.size());
+                    m_current.erase(m_current.begin(), beyond);
                     return Element{
                         spdlog::log_clock::now(),
                         spdlog::level::critical,
@@ -63,20 +64,20 @@ Session::Session(std::unique_ptr<Socket>&& socket,
 void
 Session::read()
 {
-    auto self = shared_from_this();
-    m_socket->async_read_some(asio::buffer(m_buffer),
-                              [self](const auto ec, const std::size_t length) {
-                                  if (!ec)
-                                  {
-                                      auto&& elements = self->m_processor(
-                                          self->m_buffer.data(), length);
-                                      if (!elements.empty())
-                                      {
-                                          self->m_push(std::move(elements));
-                                      }
-                                      self->read();
-                                  }
-                              });
+    m_socket->async_read_some(
+        asio::buffer(m_buffer),
+        [self = shared_from_this()](const auto ec, const std::size_t length) {
+            if (!ec)
+            {
+                auto&& elements =
+                    self->m_processor(self->m_buffer.data(), length);
+                if (!elements.empty())
+                {
+                    self->m_push(std::move(elements));
+                }
+                self->read();
+            }
+        });
 }
 
 } // namespace scriptor

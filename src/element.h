@@ -3,6 +3,7 @@
 #include <spdlog/common.h>
 
 #include <string>
+#include <vector>
 
 namespace scriptor
 {
