@@ -22,14 +22,11 @@ scriptor currently supports the following loggers:
 ```
 sudo apt install libsystemd-dev  # If built for Linux. Adjust for your distro
 python3 bootstrap.py  # Uses conan to install asio, nlohmann_json, spdlog to ~/.conan
-mkdir build && cd build
-cmake ..
-make -j
-sudo make install
+cmake --install . -j 4 --config Release
 ```
 Optionally configure the systemd service for Linux:
 ```
-sudo cp ../systemd/scriptor.service /etc/systemd/system/
+sudo cp systemd/scriptor.service /etc/systemd/system/
 sudo chmod 664 /etc/systemd/system/scriptor.service
 sudo systemctl daemon-reload
 sudo systemctl start scriptor.service
