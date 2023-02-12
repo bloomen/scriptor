@@ -19,7 +19,7 @@ scriptor currently supports the following loggers:
 * Rotating file
 * Systemd (Linux only)
 * Syslog (Linux only)
-* Windows EventLog (Windows only)
+* EventLog (Windows only)
 
 ## Build & Install
 
