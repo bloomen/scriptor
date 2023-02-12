@@ -45,23 +45,22 @@ You'd want to edit the `scriptor.service` file to fit your needs.
 ```
 $ ./scriptor --help
 scriptor - A high-performance logger using unix/tcp sockets:
-  -h, --help                          Display this help message
-  --socket_file arg                   The unix socket filename
-  --socket_address arg                The tcp socket address
-  --socket_port arg (=12345)          The tcp socket port
-  --identity arg (=scriptor)          The identity name
-  --threads arg (=4)                  The number of producer threads
-  --filelog_filename arg              The filelog filename
-  --filelog_max_file_size arg (=10485760)
-                                      The filelog max file size
-  --file_sink_max_files arg (=3)      The filelog max files
-  --filelog_level arg (=0)            The filelog log level (0>=level<=5)
-  --systemd_logging                   Enables logging to systemd (Linux only)
-  --systemd_level arg (=0)            The systemd log level (0>=level<=5)
-  --syslog_logging                    Enables logging to syslog (Linux only)
-  --syslog_level arg (=0)             The syslog log level (0>=level<=5)
-  --eventlog_logging                  Enables logging to eventlog (Windows only)
-  --eventlog_level arg (=0)           The eventlog log level (0>=level<=5)
+  -h, --help                       Display this help message
+  --socket_file arg                The unix socket filename
+  --socket_address arg             The tcp socket address
+  --socket_port arg (=12345)       The tcp socket port
+  --identity arg (=scriptor)       The identity name
+  --threads arg (=4)               The number of producer threads
+  --filelog_filename arg           The filelog filename
+  --filelog_max_file_mb arg (=10)  The filelog max file size in MB
+  --file_sink_max_files arg (=3)   The filelog max files
+  --filelog_level arg (=0)         The filelog log level (0>=level<=5)
+  --systemd_logging                Enables logging to systemd (Linux only)
+  --systemd_level arg (=0)         The systemd log level (0>=level<=5)
+  --syslog_logging                 Enables logging to syslog (Linux only)
+  --syslog_level arg (=0)          The syslog log level (0>=level<=5)
+  --eventlog_logging               Enables logging to eventlog (Windows only)
+  --eventlog_level arg (=0)        The eventlog log level (0>=level<=5)
 ```
 Logging to systemd and syslog is only available on Linux.
 Logging to EventLog is only available on Windows.

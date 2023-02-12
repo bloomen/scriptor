@@ -63,11 +63,11 @@ run(int argc, char** argv)
                                          "The filelog filename",
                                          opt.file_sink_filename,
                                          &opt.file_sink_filename);
-        op.add<popl::Value<std::size_t>>("",
-                                         "filelog_max_file_size",
-                                         "The filelog max file size",
-                                         opt.file_sink_max_file_size,
-                                         &opt.file_sink_max_file_size);
+        op.add<popl::Value<double>>("",
+                                    "filelog_max_file_mb",
+                                    "The filelog max file size in MB",
+                                    opt.file_sink_max_file_size,
+                                    &opt.file_sink_max_file_size);
         op.add<popl::Value<std::size_t>>("",
                                          "file_sink_max_files",
                                          "The filelog max files",

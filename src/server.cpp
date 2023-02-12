@@ -33,7 +33,7 @@ Server::Server(const Options& opt)
     {
         auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_st>(
             opt.file_sink_filename,
-            opt.file_sink_max_file_size,
+            static_cast<std::size_t>(opt.file_sink_max_file_size * 1e6),
             opt.file_sink_max_files);
         file_sink->set_level(
             static_cast<spdlog::level::level_enum>(opt.file_sink_log_level));
