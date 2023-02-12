@@ -69,7 +69,7 @@ run(int argc, char** argv)
                                     opt.file_sink_max_file_size,
                                     &opt.file_sink_max_file_size);
         op.add<popl::Value<std::size_t>>("",
-                                         "file_sink_max_files",
+                                         "filelog_max_files",
                                          "The filelog max files",
                                          opt.file_sink_max_files,
                                          &opt.file_sink_max_files);

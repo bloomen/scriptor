@@ -53,7 +53,7 @@ scriptor - A high-performance logger using unix/tcp sockets:
   --threads arg (=4)               The number of producer threads
   --filelog_filename arg           The filelog filename
   --filelog_max_file_mb arg (=10)  The filelog max file size in MB
-  --file_sink_max_files arg (=3)   The filelog max files
+  --filelog_max_files arg (=3)     The filelog max files
   --filelog_level arg (=0)         The filelog log level (0>=level<=5)
   --systemd_logging                Enables logging to systemd (Linux only)
   --systemd_level arg (=0)         The systemd log level (0>=level<=5)
@@ -62,6 +62,7 @@ scriptor - A high-performance logger using unix/tcp sockets:
   --eventlog_logging               Enables logging to eventlog (Windows only)
   --eventlog_level arg (=0)        The eventlog log level (0>=level<=5)
 ```
+You must either provide `socket_file` (unix socket) or `socket_address` (tcp socket).
 Logging to systemd and syslog is only available on Linux.
 Logging to EventLog is only available on Windows.
 
