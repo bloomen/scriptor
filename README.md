@@ -8,6 +8,10 @@ Tested with Clang, GCC, and Visual Studio.
 
 ## Architecture
 
+scriptor is a server process that accepts unix/tcp socket connections. Once connected, clients
+can send json messages in the format defined below. scriptor then parses the json and
+forwards it to the registered loggers.
+
 ![architecture](https://raw.githubusercontent.com/bloomen/scriptor/main/architecture.png)
 
 scriptor currently supports the following loggers:
@@ -20,10 +24,13 @@ scriptor currently supports the following loggers:
 ## Build & Install
 
 ```
-sudo apt install libsystemd-dev  # If built for Linux. Adjust for your distro
+(sudo apt install libsystemd-dev)  # If built for Linux. Adjust for your distro
 python3 bootstrap.py  # Uses conan to install asio, nlohmann_json, spdlog to ~/.conan
-cmake --install . -j 4 --config Release
+cmake -DCMAKE_BUILD_TYPE=Release .
+cmake --build . -j --config Release
+cmake --install . --config Release
 ```
+
 Optionally configure the systemd service for Linux:
 ```
 sudo cp systemd/scriptor.service /etc/systemd/system/
