@@ -65,6 +65,7 @@ find_package(Threads)
 include(conan.cmake)
 conan_cmake_autodetect(settings BUILD_TYPE ${CMAKE_BUILD_TYPE})
 conan_cmake_install(PATH_OR_REFERENCE ${PROJECT_SOURCE_DIR}
+                    BUILD missing
                     REMOTE conancenter
                     SETTINGS ${settings})
 include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
