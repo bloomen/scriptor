@@ -14,10 +14,6 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
 endif()
 
-if(EXISTS "${PROJECT_SOURCE_DIR}/cmake/${CMAKE_BUILD_TYPE}.cmake")
-    include("${PROJECT_SOURCE_DIR}/cmake/${CMAKE_BUILD_TYPE}.cmake")
-endif()
-
 function(scriptor_add_flags target)
     set_property(TARGET ${target} PROPERTY CXX_STANDARD 17)
     set_property(TARGET ${target} PROPERTY CXX_EXTENSIONS OFF)
@@ -66,6 +62,18 @@ endfunction()
 
 find_package(Threads)
 
+include(conan.cmake)
+conan_cmake_autodetect(settings BUILD_TYPE ${CMAKE_BUILD_TYPE})
+conan_cmake_install(PATH_OR_REFERENCE ${PROJECT_SOURCE_DIR}
+                    REMOTE conancenter
+                    SETTINGS ${settings})
+include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
+
+find_package(asio REQUIRED)
+find_package(GTest REQUIRED)
+find_package(nlohmann_json REQUIRED)
+find_package(spdlog REQUIRED)
+
 set(scriptor_core_source_files
     ${PROJECT_SOURCE_DIR}/src/aio.h
     ${PROJECT_SOURCE_DIR}/src/acceptor.h
@@ -86,7 +94,7 @@ set(scriptor_core_source_files
 
 add_library(scriptor_core ${scriptor_core_source_files})
 scriptor_add_flags(scriptor_core)
-target_link_libraries(scriptor_core spdlog$<$<CONFIG:Debug>:d> fmt$<$<CONFIG:Debug>:d>)
+target_link_libraries(scriptor_core asio::asio nlohmann_json::nlohmann_json spdlog::spdlog)
 if(UNIX AND NOT APPLE)
     target_link_libraries(scriptor_core systemd)
 endif()
@@ -111,7 +119,7 @@ if(scriptor_build_tests)
     enable_testing()
     add_executable(scriptor_test ${scriptor_test_source_files})
     scriptor_add_flags(scriptor_test)
-    target_link_libraries(scriptor_test scriptor_core gtest$<$<CONFIG:Debug>:d>)
+    target_link_libraries(scriptor_test scriptor_core GTest::GTest)
     add_test(scriptor_test scriptor_test)
 endif()
 

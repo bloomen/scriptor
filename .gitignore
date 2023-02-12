@@ -13,6 +13,4 @@ CMakeCache.txt
 Makefile
 cmake_install.cmake
 /build
-/check_build*
 CMakeLists.txt.user
-/cmake

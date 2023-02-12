@@ -25,7 +25,7 @@ scriptor currently supports the following loggers:
 
 ```
 (sudo apt install libsystemd-dev)  # If built for Linux. Adjust for your distro
-python3 bootstrap.py  # Uses conan to install asio, nlohmann_json, spdlog to ~/.conan
+python3 bootstrap.py  # Installs conan
 cmake -DCMAKE_BUILD_TYPE=Release .
 cmake --build . -j --config Release
 cmake --install . --config Release
