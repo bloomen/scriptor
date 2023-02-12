@@ -25,14 +25,16 @@ Processor::operator()(const char* const data, const std::size_t length)
             const auto ie = m_current.find(end, is);
             if (ie != std::string::npos)
             {
-                const auto str = m_current.substr(is, ie - is + end.size());
-                m_current = m_current.substr(ie + end.size());
                 try
                 {
-                    return Element::from_json(str);
+                    auto e = Element::from_json(&m_current[is],
+                                                &m_current[ie + end.size()]);
+                    m_current = m_current.substr(ie + end.size());
+                    return e;
                 }
                 catch (std::exception& e)
                 {
+                    m_current = m_current.substr(ie + end.size());
                     return Element{
                         spdlog::log_clock::now(),
                         spdlog::level::critical,

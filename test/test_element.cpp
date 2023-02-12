@@ -10,7 +10,7 @@ TEST(element, from_json_with_all_tags)
         spdlog::log_clock::time_point{std::chrono::seconds{123124141241}},
         spdlog::level::info,
         "[doner] [456:123] [file.txt:99:foo] blah"};
-    const auto res = scriptor::Element::from_json(json);
+    const auto res = scriptor::Element::from_json(&json[0], &json[json.size()]);
     ASSERT_EQ(exp.time, res.time);
     ASSERT_EQ(exp.level, res.level);
     ASSERT_EQ(exp.message, res.message);
@@ -24,7 +24,7 @@ TEST(element, from_json_with_all_tags_and_all_string)
         spdlog::log_clock::time_point{std::chrono::seconds{123124141241}},
         spdlog::level::info,
         "[doner] [456:123] [file.txt:99:foo] blah"};
-    const auto res = scriptor::Element::from_json(json);
+    const auto res = scriptor::Element::from_json(&json[0], &json[json.size()]);
     ASSERT_EQ(exp.time, res.time);
     ASSERT_EQ(exp.level, res.level);
     ASSERT_EQ(exp.message, res.message);
@@ -35,7 +35,7 @@ TEST(element, from_json_with_none)
     const std::string json = "{}";
     const scriptor::Element exp{
         spdlog::log_clock::now(), spdlog::level::trace, "[] [:] [::] "};
-    const auto res = scriptor::Element::from_json(json);
+    const auto res = scriptor::Element::from_json(&json[0], &json[json.size()]);
     ASSERT_EQ(exp.level, res.level);
     ASSERT_EQ(exp.message, res.message);
 }
@@ -47,7 +47,7 @@ TEST(element, from_json_with_fractional_time)
     time += std::chrono::microseconds{567000};
     const scriptor::Element exp{
         time, spdlog::level::trace, "[doner] [:] [::] blah"};
-    const auto res = scriptor::Element::from_json(json);
+    const auto res = scriptor::Element::from_json(&json[0], &json[json.size()]);
     ASSERT_EQ(exp.level, res.level);
     ASSERT_EQ(exp.message, res.message);
 }
@@ -59,7 +59,7 @@ TEST(element, from_json_with_fractional_time2)
     time += std::chrono::microseconds{567890};
     const scriptor::Element exp{
         time, spdlog::level::trace, "[doner] [:] [::] blah"};
-    const auto res = scriptor::Element::from_json(json);
+    const auto res = scriptor::Element::from_json(&json[0], &json[json.size()]);
     ASSERT_EQ(exp.level, res.level);
     ASSERT_EQ(exp.message, res.message);
 }
@@ -67,17 +67,20 @@ TEST(element, from_json_with_fractional_time2)
 TEST(element, from_json_with_broken_json)
 {
     const std::string json = R"({"c":"doner","s":12345.5678901,"m:"blah"})";
-    ASSERT_ANY_THROW(scriptor::Element::from_json(json));
+    ASSERT_ANY_THROW(
+        scriptor::Element::from_json(&json[0], &json[json.size()]));
 }
 
 TEST(element, from_json_with_broken_time)
 {
     const std::string json = R"({"c":"doner","s":not_a_time,"m":"blah"})";
-    ASSERT_ANY_THROW(scriptor::Element::from_json(json));
+    ASSERT_ANY_THROW(
+        scriptor::Element::from_json(&json[0], &json[json.size()]));
 }
 
 TEST(element, from_json_with_broken_level)
 {
     const std::string json = R"({"c":"doner","l":not_a_level,"m":"blah"})";
-    ASSERT_ANY_THROW(scriptor::Element::from_json(json));
+    ASSERT_ANY_THROW(
+        scriptor::Element::from_json(&json[0], &json[json.size()]));
 }

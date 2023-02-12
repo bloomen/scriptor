@@ -10,9 +10,9 @@ namespace scriptor
 {
 
 Element
-Element::from_json(const std::string& str)
+Element::from_json(const char* const begin, const char* const end)
 {
-    const auto data = json::parse(str);
+    const auto data = json::parse(begin, end);
 
     auto find_string = [&data](const auto token) -> std::string {
         auto it = data.find(token);

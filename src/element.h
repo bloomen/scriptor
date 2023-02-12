@@ -14,7 +14,7 @@ struct Element
     std::string message;
 
     static Element
-    from_json(const std::string& str);
+    from_json(const char* begin, const char* end);
 
     bool
     operator==(const Element& o) const;
