@@ -10,10 +10,6 @@ if(scriptor_enable_asan AND scriptor_enable_tsan)
     message(FATAL_ERROR "scriptor_enable_asan and scriptor_enable_tsan cannot both be ON")
 endif()
 
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE "Release")
-endif()
-
 function(scriptor_add_flags target)
     set_property(TARGET ${target} PROPERTY CXX_STANDARD 17)
     set_property(TARGET ${target} PROPERTY CXX_EXTENSIONS OFF)
