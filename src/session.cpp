@@ -29,7 +29,7 @@ Processor::operator()(const char* const data, const std::size_t length)
                 const auto beyond = ie + 1;
                 try
                 {
-                    auto element = Element::from_json(&*is, &*beyond);
+                    auto element = Element::from_json(&*is, &*ie + 1);
                     m_current.erase(m_current.begin(), beyond);
                     return element;
                 }

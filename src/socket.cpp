@@ -13,7 +13,7 @@ UnixSocket::async_read_some(
     asio::mutable_buffers_1&& buffer,
     std::function<void(asio::error_code, std::size_t)>&& cb)
 {
-    m_socket.async_read_some(buffer, std::move(cb));
+    m_socket.async_read_some(std::move(buffer), std::move(cb));
 }
 
 TcpSocket::TcpSocket(asio::ip::tcp::socket&& socket)
@@ -26,7 +26,7 @@ TcpSocket::async_read_some(
     asio::mutable_buffers_1&& buffer,
     std::function<void(asio::error_code, std::size_t)>&& cb)
 {
-    m_socket.async_read_some(buffer, std::move(cb));
+    m_socket.async_read_some(std::move(buffer), std::move(cb));
 }
 
 } // namespace scriptor
