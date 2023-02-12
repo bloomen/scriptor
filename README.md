@@ -60,8 +60,11 @@ scriptor - A high-performance logger using unix/tcp sockets:
   --systemd_level arg (=0)            The systemd log level (0>=level<=5)
   --syslog_logging                    Enables logging to syslog (Linux only)
   --syslog_level arg (=0)             The syslog log level (0>=level<=5)
+  --eventlog_logging                  Enables logging to eventlog (Windows only)
+  --eventlog_level arg (=0)           The eventlog log level (0>=level<=5)
 ```
 Logging to systemd and syslog is only available on Linux.
+Logging to EventLog is only available on Windows.
 
 For instance:
 ```
@@ -81,5 +84,13 @@ end with a `}`. For a concrete example:
 {"c":"analysis","s":1675153178.487972,"l":1,"p":5887,\
     "f":"client.py","i":48,"n":"compute()","m":"hello there"}
 ```
-The log level is a number between 0 (trace) and 5 (critical).
+The log level is a number between 0 and 5:
+```
+0 - trace
+1 - debug
+2 - info
+3 - warning
+4 - error
+5 - critical
+```
 To see how to talk to scriptor from python check the examples under the `clients` directory.
