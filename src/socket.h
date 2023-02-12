@@ -12,8 +12,9 @@ public:
     virtual ~Socket() = default;
 
     virtual void
-    async_read_some(asio::mutable_buffers_1&& buffer,
-                    std::function<void(asio::error_code, std::size_t)>) = 0;
+    async_read_some(
+        asio::mutable_buffers_1&& buffer,
+        std::function<void(asio::error_code, std::size_t)>&& cb) = 0;
 };
 
 class UnixSocket : public Socket
@@ -24,7 +25,7 @@ public:
     void
     async_read_some(
         asio::mutable_buffers_1&& buffer,
-        std::function<void(asio::error_code, std::size_t)> cb) override;
+        std::function<void(asio::error_code, std::size_t)>&& cb) override;
 
 private:
     asio::local::stream_protocol::socket m_socket;
@@ -38,7 +39,7 @@ public:
     void
     async_read_some(
         asio::mutable_buffers_1&& buffer,
-        std::function<void(asio::error_code, std::size_t)> cb) override;
+        std::function<void(asio::error_code, std::size_t)>&& cb) override;
 
 private:
     asio::ip::tcp::socket m_socket;

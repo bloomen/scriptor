@@ -52,7 +52,7 @@ Processor::operator()(const char* const data, const std::size_t length)
 }
 
 Session::Session(std::unique_ptr<Socket>&& socket,
-                 std::function<void(std::vector<Element>&&)> push)
+                 std::function<void(std::vector<Element>&&)>&& push)
     : m_socket{std::move(socket)}
     , m_push{std::move(push)}
 {

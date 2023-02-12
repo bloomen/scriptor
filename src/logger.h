@@ -12,7 +12,7 @@ namespace scriptor
 class Logger
 {
 public:
-    explicit Logger(spdlog::sink_ptr sink);
+    explicit Logger(spdlog::sink_ptr&& sink);
     ~Logger();
 
     Logger(const Logger&) = delete;

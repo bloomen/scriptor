@@ -5,7 +5,7 @@
 namespace scriptor
 {
 
-Logger::Logger(spdlog::sink_ptr sink)
+Logger::Logger(spdlog::sink_ptr&& sink)
     : m_sink{std::move(sink)}
 {
     m_thread = std::thread{[this] { worker(); }};

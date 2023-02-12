@@ -18,10 +18,11 @@ namespace scriptor
 
 Server::Server(const Options& opt)
     : m_ioc{static_cast<int>(opt.n_threads)}
+    , m_acceptor{make_acceptor(m_ioc,
+                               opt.socket_file,
+                               opt.socket_address,
+                               opt.socket_port)}
 {
-    m_acceptor = make_acceptor(
-        m_ioc, opt.socket_file, opt.socket_address, opt.socket_port);
-
     // Setup loggers
     const std::string pattern = "[%Y-%m-%dT%H:%M:%S.%f] [%l] %v";
 
