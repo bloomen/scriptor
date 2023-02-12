@@ -12,7 +12,7 @@ scriptor is a server process that accepts unix/tcp socket connections. Once conn
 can send json messages in the format defined below. scriptor then parses the json and
 forwards it to the registered loggers.
 
-![architecture](https://raw.githubusercontent.com/bloomen/scriptor/main/architecture.png)
+![arch](https://raw.githubusercontent.com/bloomen/scriptor/main/arch.png)
 
 scriptor currently supports the following loggers:
 
