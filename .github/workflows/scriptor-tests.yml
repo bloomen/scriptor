@@ -28,6 +28,6 @@ jobs:
       - name: run tests
         run: |
           python3 bootstrap.py
-          cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_BUILD_TYPE=${{ matrix.config }} -Dscriptor_build_tests=ON -Dscriptor_enable_asan=${{ matrix.asan }} .
+          cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_BUILD_TYPE=${{ matrix.config }} -Dscriptor_build_tests=ON -Dscriptor_enable_asan=${{ matrix.asan }} -Dscriptor_enable_tsan=${{ matrix.tsan }} .
           cmake --build . -j --config ${{ matrix.config }}
           ctest --verbose
