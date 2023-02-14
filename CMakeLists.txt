@@ -118,10 +118,6 @@ if(scriptor_build_tests)
     scriptor_add_flags(scriptor_test)
     target_link_libraries(scriptor_test scriptor_core GTest::GTest)
     add_test(scriptor_test scriptor_test)
-    if(APPLE)
-        set_tests_properties(scriptor_test PROPERTIES
-            ENVIRONMENT TSAN_OPTIONS="suppressions=${PROJECT_SOURCE_DIR}/tsan_ignore.txt")
-    endif()
 endif()
 
 set(scriptor_source_files
