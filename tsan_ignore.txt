@@ -1,1 +1,2 @@
-race:asio
+race:asio::detail::conditionally_enabled_mutex
+race:asio::detail::kqueue_reactor

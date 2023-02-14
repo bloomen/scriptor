@@ -33,7 +33,7 @@ jobs:
       - name: Run tests on Posix
         if: runner.os != 'Windows'
         run: |
-          TSAN_OPTIONS="suppressions=tsan_ignore.txt" ./scriptor_tests
+          TSAN_OPTIONS="suppressions=tsan_ignore.txt" ./scriptor_test
       - name: Run tests on Windows
         if: runner.os == 'Windows'
         run: |
