@@ -1,2 +1,1 @@
-race:*/asio/detail/conditionally_enabled_mutex.hpp
-race:*/asio/detail/kqueue_reactor.hpp
+race:asio
