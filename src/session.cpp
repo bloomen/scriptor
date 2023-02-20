@@ -33,7 +33,7 @@ Processor::operator()(const char* const data, const std::size_t length)
                     m_current.erase(m_current.begin(), beyond);
                     return element;
                 }
-                catch (std::exception& e)
+                catch (const std::exception& e)
                 {
                     m_current.erase(m_current.begin(), beyond);
                     return Element{
