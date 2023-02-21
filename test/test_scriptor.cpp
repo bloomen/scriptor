@@ -132,9 +132,11 @@ test_scriptor_run(const bool tcp, const bool unix, const int log_level)
                 const asio::ip::tcp::endpoint endpoint{
                     asio::ip::address::from_string("127.0.0.1"), port};
                 socket.connect(endpoint);
-                socket.send(asio::buffer(message1), 0);
+                socket.send(asio::buffer(message1),
+                            asio::socket_base::message_end_of_record);
                 std::this_thread::sleep_for(std::chrono::milliseconds{200});
-                socket.send(asio::buffer(message2), 0);
+                socket.send(asio::buffer(message2),
+                            asio::socket_base::message_end_of_record);
             }
             if (unix)
             {
@@ -142,9 +144,11 @@ test_scriptor_run(const bool tcp, const bool unix, const int log_level)
                 const asio::local::stream_protocol::endpoint endpoint{
                     socket_file};
                 socket.connect(endpoint);
-                socket.send(asio::buffer(message1), 0);
+                socket.send(asio::buffer(message1),
+                            asio::socket_base::message_end_of_record);
                 std::this_thread::sleep_for(std::chrono::milliseconds{200});
-                socket.send(asio::buffer(message2), 0);
+                socket.send(asio::buffer(message2),
+                            asio::socket_base::message_end_of_record);
             }
             std::this_thread::sleep_for(std::chrono::seconds{1});
             scriptor::stop(SIGINT);
