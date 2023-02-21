@@ -98,9 +98,9 @@ test_scriptor_run(const bool tcp, const bool unix, const int log_level)
 {
     asio::io_context ioc;
     const std::string message1 =
-        R"({"c":"doner","s":"1253370013","l":"2","p":"456","t":"123","f":"file.txt","i":99,"n":"foo","m":"blah"})";
+        R"({"c":"doner","s":"1253370013","l":"2","p":"456","t":"123","f":"file.txt","i":99,"n":"foo","m":"blah"}\n)";
     const std::string message2 =
-        R"({"c":"analysis","s":1675153178.487972,"l":3,"p":5887,"f":"client.py","i":48,"n":"compute","m":"hello there"})";
+        R"({"c":"analysis","s":1675153178.487972,"l":3,"p":5887,"f":"client.py","i":48,"n":"compute","m":"hello there"}\n)";
     const auto socket_file = random_string(10);
     const asio::ip::port_type port = 12346;
     const std::string port_str = std::to_string(port);
@@ -132,11 +132,9 @@ test_scriptor_run(const bool tcp, const bool unix, const int log_level)
                 const asio::ip::tcp::endpoint endpoint{
                     asio::ip::address::from_string("127.0.0.1"), port};
                 socket.connect(endpoint);
-                socket.send(asio::buffer(message1),
-                            asio::socket_base::message_end_of_record);
+                socket.send(asio::buffer(message1), 0);
                 std::this_thread::sleep_for(std::chrono::milliseconds{200});
-                socket.send(asio::buffer(message2),
-                            asio::socket_base::message_end_of_record);
+                socket.send(asio::buffer(message2), 0);
             }
             if (unix)
             {
@@ -144,11 +142,9 @@ test_scriptor_run(const bool tcp, const bool unix, const int log_level)
                 const asio::local::stream_protocol::endpoint endpoint{
                     socket_file};
                 socket.connect(endpoint);
-                socket.send(asio::buffer(message1),
-                            asio::socket_base::message_end_of_record);
+                socket.send(asio::buffer(message1), 0);
                 std::this_thread::sleep_for(std::chrono::milliseconds{200});
-                socket.send(asio::buffer(message2),
-                            asio::socket_base::message_end_of_record);
+                socket.send(asio::buffer(message2), 0);
             }
             std::this_thread::sleep_for(std::chrono::seconds{1});
             scriptor::stop(SIGINT);
