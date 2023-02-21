@@ -62,7 +62,7 @@ scriptor - A high-performance logger using unix/tcp sockets:
   --eventlog_logging               Enables logging to eventlog (Windows only)
   --eventlog_level arg (=0)        The eventlog log level (0>=level<=5)
 ```
-You must either provide `socket_file` (unix socket) or `socket_address` (tcp socket).
+You'll need to provide `socket_file` (unix socket) and/or `socket_address` (tcp socket).
 Logging to systemd and syslog is only available on Linux.
 Logging to EventLog is only available on Windows.
 

@@ -94,7 +94,7 @@ TEST(scriptor, with_invalid_option)
 }
 
 void
-test_scriptor_run(const bool tcp, const int log_level)
+test_scriptor_run(const bool tcp, const bool unix, const int log_level)
 {
     asio::io_context ioc;
     const std::string message1 =
@@ -118,39 +118,49 @@ test_scriptor_run(const bool tcp, const int log_level)
         argv.push_back((char*)"--socket_port");
         argv.push_back((char*)port_str.c_str());
     }
-    else
+    if (unix)
     {
         argv.push_back((char*)"--socket_file");
         argv.push_back((char*)socket_file.c_str());
     }
-    std::thread thread{[&ioc, tcp, &socket_file, port, &message1, &message2] {
-        std::this_thread::sleep_for(std::chrono::seconds{1});
-        if (tcp)
-        {
-            asio::ip::tcp::socket socket{ioc};
-            const asio::ip::tcp::endpoint endpoint{
-                asio::ip::address::from_string("127.0.0.1"), port};
-            socket.connect(endpoint);
-            socket.send(asio::buffer(message1), 0);
-            std::this_thread::sleep_for(std::chrono::milliseconds{200});
-            socket.send(asio::buffer(message2), 0);
-        }
-        else
-        {
-            asio::local::stream_protocol::socket socket{ioc};
-            const asio::local::stream_protocol::endpoint endpoint{socket_file};
-            socket.connect(endpoint);
-            socket.send(asio::buffer(message1), 0);
-            std::this_thread::sleep_for(std::chrono::milliseconds{200});
-            socket.send(asio::buffer(message2), 0);
-        }
-        std::this_thread::sleep_for(std::chrono::seconds{1});
-        scriptor::stop(SIGINT);
-    }};
+    std::thread thread{
+        [&ioc, tcp, unix, &socket_file, port, &message1, &message2] {
+            std::this_thread::sleep_for(std::chrono::seconds{1});
+            if (tcp)
+            {
+                asio::ip::tcp::socket socket{ioc};
+                const asio::ip::tcp::endpoint endpoint{
+                    asio::ip::address::from_string("127.0.0.1"), port};
+                socket.connect(endpoint);
+                socket.send(asio::buffer(message1), 0);
+                std::this_thread::sleep_for(std::chrono::milliseconds{200});
+                socket.send(asio::buffer(message2), 0);
+            }
+            if (unix)
+            {
+                asio::local::stream_protocol::socket socket{ioc};
+                const asio::local::stream_protocol::endpoint endpoint{
+                    socket_file};
+                socket.connect(endpoint);
+                socket.send(asio::buffer(message1), 0);
+                std::this_thread::sleep_for(std::chrono::milliseconds{200});
+                socket.send(asio::buffer(message2), 0);
+            }
+            std::this_thread::sleep_for(std::chrono::seconds{1});
+            scriptor::stop(SIGINT);
+        }};
     const auto code = scriptor::run(static_cast<int>(argv.size()), argv.data());
-    ASSERT_EQ(0, code);
     thread.join();
-    if (!tcp)
+    if (!tcp && !unix)
+    {
+        ASSERT_EQ(1, code);
+        return;
+    }
+    else
+    {
+        ASSERT_EQ(0, code);
+    }
+    if (unix)
     {
         std::filesystem::remove(socket_file);
     }
@@ -168,6 +178,10 @@ test_scriptor_run(const bool tcp, const int log_level)
             R"([2023-01-31T08:19:38.487972] [warning] [analysis] [5887:] [client.py:48:compute] hello there
 )";
     }
+    if (tcp && unix)
+    {
+        exp += exp;
+    }
     const auto content = read_from_file(filelog_filename);
     ASSERT_EQ(exp, content);
     std::filesystem::remove(filelog_filename);
@@ -176,21 +190,38 @@ test_scriptor_run(const bool tcp, const int log_level)
 #ifndef SCRIPTOR_WINDOWS
 TEST(scriptor, run_using_unix_socket_at_info_level)
 {
-    test_scriptor_run(false, 2);
+    test_scriptor_run(false, true, 2);
 }
 
 TEST(scriptor, run_using_unix_socket_at_warning_level)
 {
-    test_scriptor_run(false, 3);
+    test_scriptor_run(false, true, 3);
+}
+
+TEST(scriptor, run_using_tcp_and_unix_socket_at_info_level)
+{
+    test_scriptor_run(true, true, 2);
+}
+
+TEST(scriptor, run_using_tcp_and_unix_socket_at_warning_level)
+{
+    test_scriptor_run(true, true, 3);
 }
 #endif
 
 TEST(scriptor, run_using_tcp_socket_at_info_level)
 {
-    test_scriptor_run(true, 2);
+    test_scriptor_run(true, false, 2);
 }
 
 TEST(scriptor, run_using_tcp_socket_at_warning_level)
 {
-    test_scriptor_run(true, 3);
+    test_scriptor_run(true, false, 3);
+}
+
+TEST(scriptor, run_using_neither_socket)
+{
+    std::stringstream buffer;
+    CerrRedirect cr{buffer.rdbuf()};
+    test_scriptor_run(false, false, 2);
 }

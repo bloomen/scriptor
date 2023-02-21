@@ -21,11 +21,25 @@ namespace scriptor
 
 Server::Server(const Options& opt)
     : m_ioc{static_cast<int>(opt.n_threads)}
-    , m_acceptor{make_acceptor(m_ioc,
-                               opt.socket_file,
-                               opt.socket_address,
-                               opt.socket_port)}
 {
+    // Setup acceptors
+    if (!opt.socket_file.empty())
+    {
+        m_acceptors.emplace_back(std::make_unique<UnixAcceptor>(
+            m_ioc, asio::local::stream_protocol::endpoint{opt.socket_file}));
+    }
+    if (!opt.socket_address.empty())
+    {
+        const auto address = asio::ip::address::from_string(opt.socket_address);
+        m_acceptors.emplace_back(std::make_unique<TcpAcceptor>(
+            m_ioc, asio::ip::tcp::endpoint{address, opt.socket_port}));
+    }
+    if (m_acceptors.empty())
+    {
+        throw std::runtime_error{
+            "Must provide socket_file and/or socket_address!"};
+    }
+
     // Setup loggers
     const std::string pattern = "[%Y-%m-%dT%H:%M:%S.%f] [%l] %v";
 
@@ -119,29 +133,32 @@ Server::~Server()
 void
 Server::accept()
 {
-    m_acceptor->async_accept(
-        [this](const auto ec, std::unique_ptr<Socket>&& socket) {
-            if (!ec)
-            {
-                std::make_shared<Session>(
-                    std::move(socket),
-                    [this](std::vector<Element>&& elements) {
-                        if (m_loggers.size() == 1)
-                        {
-                            m_loggers.front().push(std::move(elements));
-                        }
-                        else
-                        {
-                            for (auto& logger : m_loggers)
+    for (auto& acceptor : m_acceptors)
+    {
+        acceptor->async_accept(
+            [this](const auto ec, std::unique_ptr<Socket>&& socket) {
+                if (!ec)
+                {
+                    std::make_shared<Session>(
+                        std::move(socket),
+                        [this](std::vector<Element>&& elements) {
+                            if (m_loggers.size() == 1)
                             {
-                                logger.push(elements);
+                                m_loggers.front().push(std::move(elements));
                             }
-                        }
-                    })
-                    ->read();
-            }
-            accept();
-        });
+                            else
+                            {
+                                for (auto& logger : m_loggers)
+                                {
+                                    logger.push(elements);
+                                }
+                            }
+                        })
+                        ->read();
+                }
+                accept();
+            });
+    }
 }
 
 void

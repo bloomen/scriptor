@@ -43,10 +43,4 @@ private:
     asio::ip::tcp::acceptor m_acceptor;
 };
 
-std::unique_ptr<Acceptor>
-make_acceptor(asio::io_context& ioc,
-              const std::string& file,
-              const std::string& ip,
-              asio::ip::port_type port);
-
 } // namespace scriptor

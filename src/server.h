@@ -51,7 +51,7 @@ private:
     shutdown();
 
     asio::io_context m_ioc;
-    std::unique_ptr<Acceptor> m_acceptor;
+    std::vector<std::unique_ptr<Acceptor>> m_acceptors;
     std::vector<std::thread> m_ioc_threads;
     std::list<Logger> m_loggers;
 };

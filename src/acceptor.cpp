@@ -35,26 +35,4 @@ TcpAcceptor::async_accept(
         });
 }
 
-std::unique_ptr<Acceptor>
-make_acceptor(asio::io_context& ioc,
-              const std::string& file,
-              const std::string& ip,
-              const asio::ip::port_type port)
-{
-    if (!file.empty())
-    {
-        return std::make_unique<UnixAcceptor>(
-            ioc, asio::local::stream_protocol::endpoint{file});
-    }
-    if (!ip.empty())
-    {
-        const auto address = asio::ip::address::from_string(ip);
-        return std::make_unique<TcpAcceptor>(
-            ioc, asio::ip::tcp::endpoint{address, port});
-    }
-    throw std::runtime_error{
-        "Must provide either socket_file or socket_address!"};
-    return nullptr;
-}
-
 } // namespace scriptor
