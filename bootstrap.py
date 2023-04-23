@@ -11,7 +11,7 @@ def main():
     subprocess.check_call([
         'pip3',
         'install',
-        'conan',
+        'conan==1.45.0',
     ])
 
     try:
