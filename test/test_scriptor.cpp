@@ -133,7 +133,7 @@ test_scriptor_run(const bool tcp, const bool unix, const int log_level)
                     asio::ip::address::from_string("127.0.0.1"), port};
                 socket.connect(endpoint);
                 socket.send(asio::buffer(message1), 0);
-                std::this_thread::sleep_for(std::chrono::milliseconds{200});
+                std::this_thread::sleep_for(std::chrono::milliseconds{500});
                 socket.send(asio::buffer(message2), 0);
             }
             if (unix)
@@ -143,7 +143,7 @@ test_scriptor_run(const bool tcp, const bool unix, const int log_level)
                     socket_file};
                 socket.connect(endpoint);
                 socket.send(asio::buffer(message1), 0);
-                std::this_thread::sleep_for(std::chrono::milliseconds{200});
+                std::this_thread::sleep_for(std::chrono::milliseconds{500});
                 socket.send(asio::buffer(message2), 0);
             }
             std::this_thread::sleep_for(std::chrono::seconds{1});
