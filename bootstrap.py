@@ -11,28 +11,15 @@ def main():
     subprocess.check_call([
         'pip3',
         'install',
-        'conan==1.45.0',
+        'conan',
     ])
 
-    try:
-        subprocess.check_call([
-            'conan',
-            'profile',
-            'new',
-            'default',
-            '--detect',
-        ], stderr=subprocess.PIPE)
-    except BaseException as e:
-        pass
-
-    if platform.system() == 'Linux':
-        subprocess.check_call([
-            'conan',
-            'profile',
-            'update',
-            'settings.compiler.libcxx=libstdc++11',
-            'default',
-        ])
+    subprocess.check_call([
+        'conan',
+        'profile',
+        'detect',
+        '--force',
+    ])
 
 
 if __name__ == '__main__':

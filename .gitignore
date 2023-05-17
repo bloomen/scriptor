@@ -14,3 +14,4 @@ Makefile
 cmake_install.cmake
 /build
 CMakeLists.txt.user
+CMakeUserPresets.json

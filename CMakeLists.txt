@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.0)
 project(scriptor)
 
+cmake_policy(SET CMP0054 NEW)
+
 option(scriptor_build_tests "Build scriptor tests." OFF)
 option(scriptor_enable_asan "Build scriptor with address sanitizer." OFF)
 option(scriptor_enable_tsan "Build scriptor with thread sanitizer." OFF)
@@ -9,6 +11,9 @@ option(scriptor_enable_coverage "Build scriptor with coverage reporting." OFF)
 if(scriptor_enable_asan AND scriptor_enable_tsan)
     message(FATAL_ERROR "scriptor_enable_asan and scriptor_enable_tsan cannot both be ON")
 endif()
+
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
+list(APPEND CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR})
 
 function(scriptor_add_flags target)
     set_property(TARGET ${target} PROPERTY CXX_STANDARD 17)
@@ -63,8 +68,8 @@ conan_cmake_autodetect(settings)
 conan_cmake_install(PATH_OR_REFERENCE ${PROJECT_SOURCE_DIR}
                     BUILD missing
                     REMOTE conancenter
-                    SETTINGS ${settings})
-include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
+                    SETTINGS ${settings}
+                    OUTPUT_FOLDER ${CMAKE_BINARY_DIR})
 
 find_package(asio REQUIRED)
 find_package(GTest REQUIRED)
