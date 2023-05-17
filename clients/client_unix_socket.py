@@ -8,17 +8,27 @@ class ScriptorHandler(logging.Handler):
     def __init__(self, socket_file, channel_name, level=logging.NOTSET):
         super().__init__(level)
         self._socket_file = socket_file
-        self._connect()
         self._channel_name = channel_name
 
-    def _connect(self):
+    def _close(self):
         try:
-            self._sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-            self._sock.connect(self._socket_file)
+            self._sock.shutdown(SHUT_WR)
+            self._sock.close()
         except BaseException:
             pass
 
+    def _connect(self):
+        self._close()
+        try:
+            self._sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            self._sock.connect(self._socket_file)
+            return True
+        except BaseException:
+            return False
+
     def emit(self, record):
+        if not self._connect():
+            return
         msg = dict(c=self._channel_name,
                    s=record.created,
                    l=int(record.levelno / 10),
@@ -31,7 +41,9 @@ class ScriptorHandler(logging.Handler):
         try:
             self._sock.send(bytes)
         except BaseException:
-            self._connect()
+            pass
+        finally:
+            self._close()
 
 
 logger = logging.getLogger(__name__)
