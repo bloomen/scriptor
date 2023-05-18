@@ -198,13 +198,13 @@ macro(_conan_detect_compiler)
                     AND "${CMAKE_${LANGUAGE}_COMPILER_FRONTEND_VARIANT}" STREQUAL "MSVC" 
                     AND "${CMAKE_${LANGUAGE}_SIMULATE_ID}" STREQUAL "MSVC"))
 
-        set(_VISUAL "Visual Studio")
+        set(_VISUAL msvc)
         _get_msvc_ide_version(_VISUAL_VERSION)
         if("${_VISUAL_VERSION}" STREQUAL "")
             message(FATAL_ERROR "Conan: Visual Studio not recognized")
         else()
             set(_CONAN_SETTING_COMPILER ${_VISUAL})
-            set(_CONAN_SETTING_COMPILER_VERSION ${_VISUAL_VERSION})
+            set(_CONAN_SETTING_COMPILER_VERSION ${MSVC_VERSION})
         endif()
 
         if(NOT _CONAN_SETTING_ARCH)
