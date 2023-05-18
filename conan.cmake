@@ -204,7 +204,7 @@ macro(_conan_detect_compiler)
             message(FATAL_ERROR "Conan: Visual Studio not recognized")
         else()
             set(_CONAN_SETTING_COMPILER ${_VISUAL})
-            set(_CONAN_SETTING_COMPILER_VERSION ${MSVC_VERSION})
+            set(_CONAN_SETTING_COMPILER_VERSION 193)
         endif()
 
         if(NOT _CONAN_SETTING_ARCH)
