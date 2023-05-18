@@ -222,7 +222,7 @@ macro(_conan_detect_compiler)
 
         conan_cmake_detect_vs_runtime(_vs_runtime ${ARGV})
         message(STATUS "Conan: Detected VS runtime: ${_vs_runtime}")
-        set(_CONAN_SETTING_COMPILER_RUNTIME ${_vs_runtime})
+        set(_CONAN_SETTING_COMPILER_RUNTIME static)
 
         if (CMAKE_GENERATOR_TOOLSET)
             set(_CONAN_SETTING_COMPILER_TOOLSET ${CMAKE_VS_PLATFORM_TOOLSET})
