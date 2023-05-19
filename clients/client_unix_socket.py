@@ -12,7 +12,7 @@ class ScriptorHandler(logging.Handler):
 
     def _close(self):
         try:
-            self._sock.shutdown(SHUT_WR)
+            self._sock.shutdown(socket.SHUT_WR)
             self._sock.close()
         except BaseException:
             pass
